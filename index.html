@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Message Display</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        #textDisplay { 
+            font-size: 5vw; /* Responsive font size */
+            font-weight: bold; 
+            margin: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+        button { 
+            padding: 10px 20px; 
+            font-size: 16px; 
+            cursor: pointer; 
+            border: none; 
+            background: #007bff; 
+            color: white; 
+            border-radius: 5px; 
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+        }
+        button:hover { 
+            background: #0056b3; 
+        }
+        #speakButton {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+        }
+        #speedControl {
+            position: absolute;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+        }
+        #speedValue {
+            margin-left: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h2 style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%);">Received Message:</h2>
+    <div id="textDisplay">Waiting for message...</div>
+    <button onclick="fetchMessage()">Refresh</button>
+    <button id="speakButton" onclick="speakText()">Speak</button>
+
+    <!-- Speed Control Slider -->
+    <div id="speedControl">
+        <label for="speedSlider">Speed:</label>
+        <input type="range" id="speedSlider" min="0.1" max="2" step="0.1" value="1">
+        <span id="speedValue">1.0</span>
+    </div>
+
+    <script>
+        let lastMessage = ""; // To track the last displayed message
+
+        // Function to fetch message from Firebase (/message/text)
+        function fetchMessage() {
+            fetch("https://ritemacro-default-rtdb.firebaseio.com/message/text.json")
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data !== lastMessage) {
+                        document.getElementById("textDisplay").innerText = data;
+                        speakText(data); // Automatically announce new message
+                        lastMessage = data; // Update last message
+                    } else if (!data) {
+                        document.getElementById("textDisplay").innerText = "No message found!";
+                    }
+                })
+                .catch(error => console.error("Error fetching data:", error));
+        }
+
+        // Text-to-Speech functionality
+        function speakText(text = null) {
+            const message = text || document.getElementById("textDisplay").innerText;
+
+            // Convert numbers to individual digits (e.g., "123" -> "one two three")
+            const processedMessage = message.replace(/\d/g, digit => {
+                const numberMap = {
+                    '0': 'zero', '1': 'one', '2': 'two', '3': 'three', '4': 'four',
+                    '5': 'five', '6': 'six', '7': 'seven', '8': 'eight', '9': 'nine'
+                };
+                return numberMap[digit] + ' ';
+            });
+
+            const utterance = new SpeechSynthesisUtterance(processedMessage);
+            utterance.lang = "hi-IN"; // Set language to Hindi
+            utterance.rate = parseFloat(document.getElementById("speedSlider").value); // Set speaking speed
+            speechSynthesis.speak(utterance);
+        }
+
+        // Update speed value display
+        document.getElementById("speedSlider").addEventListener("input", function () {
+            document.getElementById("speedValue").innerText = this.value;
+        });
+
+        // Auto-refresh every 2 seconds
+        setInterval(fetchMessage, 2000);
+
+        // Auto-fetch on page load
+        fetchMessage();
+    </script>
+</body>
+</html>
