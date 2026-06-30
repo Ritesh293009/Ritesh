@@ -78,6 +78,7 @@
   .btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
   .btn-ghost:hover{background:var(--border);}
   .btn-outline{background:transparent;border:1.5px solid var(--brand2);color:var(--brand2);}
+  .btn-sm{padding:9px 14px;font-size:.78rem;width:auto;}
 
   /* ── Sections / cards ───────────────────────────────────────────────── */
   .page-title{font-size:1.4rem;font-weight:800;margin-bottom:4px;color:var(--text);}
@@ -132,22 +133,35 @@
   .badge-rejected{background:rgba(225,29,72,.1);color:var(--danger);}
   .badge-completed{background:rgba(255,122,69,.12);color:var(--brand1);}
   .order-meta{font-size:.8rem;color:var(--muted);display:flex;justify-content:space-between;margin-top:8px;}
+  .order-files-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+  .order-file-chip{font-size:.72rem;background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:4px 10px;text-decoration:none;color:var(--text);font-weight:600;}
+  .order-actions{display:flex;gap:8px;margin-top:10px;}
 
   /* ── Uploaded Files page ───────────────────────────────────────────── */
   .files-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
   @media(max-width:480px){.files-grid{grid-template-columns:repeat(2,1fr);gap:10px;}}
-  .file-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s;}
+  .file-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;transition:transform .15s,box-shadow .15s;}
   .file-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
-  .file-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:var(--surface2);}
+  .file-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:var(--surface2);cursor:pointer;}
   .file-card-info{padding:9px 10px;}
   .file-card-label{font-size:.72rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .file-card-sub{font-size:.66rem;color:var(--muted);margin-top:1px;}
+  .file-card-actions{display:flex;gap:6px;padding:0 10px 10px;}
+  .file-card-actions a{flex:1;text-align:center;font-size:.7rem;font-weight:700;padding:6px 0;border-radius:8px;text-decoration:none;}
+  .fca-view{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+  .fca-download{background:rgba(37,99,235,.1);color:var(--brand2);border:1px solid rgba(37,99,235,.25);}
   .file-group-title{font-size:.78rem;font-weight:800;color:var(--brand2);text-transform:uppercase;letter-spacing:.03em;margin:22px 0 10px;display:flex;align-items:center;gap:8px;}
   .file-group-title:first-child{margin-top:0;}
   .file-lightbox{position:fixed;inset:0;z-index:600;background:rgba(20,15,5,.85);display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px);}
   .file-lightbox.open{display:flex;}
   .file-lightbox img{max-width:92vw;max-height:88vh;border-radius:14px;box-shadow:var(--shadow);}
   .file-lightbox-close{position:fixed;top:18px;right:18px;background:rgba(255,255,255,.92);border:none;width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+  /* ── Add-file-to-order modal ─────────────────────────────────────────── */
+  .modal-overlay{position:fixed;inset:0;background:rgba(20,15,5,.45);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:380px;box-shadow:var(--shadow);}
+  .modal-box h3{margin-bottom:16px;}
 
   .empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
   .empty-state h3{color:var(--text);margin-bottom:6px;font-size:1.05rem;}
@@ -232,11 +246,26 @@
   <img id="fileLightboxImg" src="" alt="">
 </div>
 
+<!-- ════ ADD FILE TO ORDER MODAL ════ -->
+<div class="modal-overlay" id="addFileModal">
+  <div class="modal-box">
+    <h3>📤 File Upload Karein</h3>
+    <div class="field"><label>Order</label><input type="text" id="afOrderId" disabled></div>
+    <div class="field"><label>File Label</label><input type="text" id="afLabel" placeholder="e.g. Extra Document"></div>
+    <div class="field"><label>Choose File</label><input type="file" id="afFile" accept="image/*,application/pdf"></div>
+    <div class="err-text" id="afErr"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-ghost" onclick="closeAddFileModal()">Cancel</button>
+      <button class="btn btn-accent" onclick="submitAddFile()">Upload</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
 // ════════════════════════════════════════════════════════════════════════════
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyF8Ie_z8G1ByLlzbokZHcAZ9ZpezuLXpVG-OLNFGYMJuu5ftI5fGVDWQu_sl6Ye6Up/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxU7i3QwApaCxzsFDJet70EcQ7ptNqmPrFMYESFb3rawa5VEm7o4us05WW83yqBrnA/exec';
 const UPI_ID = 'BHARATPE2O0Y0W1R5Z29125@unitype';
 const UPI_NAME = 'Ritesh Bharatpay';
 const SESSION_KEY = 'csc_session';
@@ -244,6 +273,8 @@ const SESSION_KEY = 'csc_session';
 let session = null;       // { mobile, name }
 let servicesCache = [];
 let currentOrderDraft = {}; // build-up object for the form being filled
+let currentDynamicFields = []; // fields[] of the service currently open (if dynamic form)
+let activeAddFileOrderId = null;
 
 // ── BOOT ──────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
@@ -356,6 +387,13 @@ const SERVICE_COLORS = {
   pan_card:    { main:'#9333ea', soft:'#f4ebfd' },
   udyam:       { main:'#e11d48', soft:'#fdebef' }
 };
+// Colours cycle for any new service the admin adds, so cards still look distinct
+const FALLBACK_COLORS = [
+  { main:'#0d9488', soft:'#e3f5f3' },
+  { main:'#ca8a04', soft:'#fdf3da' },
+  { main:'#db2777', soft:'#fde6f1' },
+  { main:'#475569', soft:'#eaedf1' }
+];
 
 async function renderServiceHub() {
   const main = document.getElementById('mainContent');
@@ -368,8 +406,8 @@ async function renderServiceHub() {
     servicesCache = data.services;
 
     let html = `<div class="page-title">Namaste, ${esc(session.name)} 👋</div><div class="page-sub">Service select karein</div><div class="service-grid">`;
-    servicesCache.forEach(s => {
-      const col = SERVICE_COLORS[s.id] || { main:'#ff7a45', soft:'#fff0e8' };
+    servicesCache.forEach((s, idx) => {
+      const col = SERVICE_COLORS[s.id] || FALLBACK_COLORS[idx % FALLBACK_COLORS.length];
       html += `
         <div class="service-card" style="--card-color:${col.main};--card-color-soft:${col.soft}" onclick="openService('${esc(s.id)}')">
           <div class="service-icon">${SERVICE_ICONS[s.id] || '📋'}</div>
@@ -385,6 +423,11 @@ async function renderServiceHub() {
   }
 }
 
+// Services with a dedicated hand-built form. Anything else (including every
+// new service the admin adds from the panel) automatically gets a generic
+// form built live from that service's "fields" list.
+const CUSTOM_FORM_SERVICES = ['photo_print','pvc_card','certificate','pan_card','udyam'];
+
 function openService(id) {
   currentOrderDraft = { service: id, files: {}, details: {} };
   if (id === 'photo_print')  return renderPhotoPrintForm();
@@ -392,6 +435,8 @@ function openService(id) {
   if (id === 'certificate')  return renderCertificateForm();
   if (id === 'pan_card')     return renderPanCardForm();
   if (id === 'udyam')        return renderUdyamForm();
+  // ── any newly added service from the admin panel lands here ──
+  return renderDynamicForm(id);
 }
 
 function getSvc(id) { return servicesCache.find(s => s.id === id) || {}; }
@@ -434,7 +479,7 @@ async function onFileSelect(key, input) {
     const data = await res.json();
     if (!data.success) throw new Error(data.error);
 
-    currentOrderDraft.files[key] = { fileId: data.fileId, url: data.url, name: data.name };
+    currentOrderDraft.files[key] = { fileId: data.fileId, url: data.url, downloadUrl: data.downloadUrl, name: data.name };
     box.classList.add('has-file');
     lbl.textContent = '✅ ' + file.name;
     prev.src = data.thumb;
@@ -600,6 +645,52 @@ function renderUdyamForm() {
   `;
 }
 
+// ════════════════════════════════════════════════════════════════════════
+// GENERIC DYNAMIC FORM — used for any service added from the Admin Panel
+// ("+ Photo Upload" / "+ Text Input" fields configured there) that doesn't
+// have a hand-built form above. This is what was missing — clicking a new
+// service previously matched nothing and rendered a blank page.
+// ════════════════════════════════════════════════════════════════════════
+function renderDynamicForm(id) {
+  const svc = getSvc(id);
+  currentDynamicFields = Array.isArray(svc.fields) ? svc.fields : [];
+
+  let fieldsHtml = '';
+  if (!currentDynamicFields.length) {
+    fieldsHtml = `<p style="color:var(--muted);font-size:.85rem;margin-bottom:16px;">Is service ke liye koi extra field set nahi hai. Seedha submit karein.</p>`;
+  } else {
+    currentDynamicFields.forEach(f => {
+      if (f.type === 'photo') {
+        fieldsHtml += uploadWidget(f.id, esc(f.label || 'Upload Photo'), !f.required);
+      } else {
+        fieldsHtml += `
+          <div class="field">
+            <label>${esc(f.label || 'Detail')}${f.required ? '' : '<span class="optional-tag">Optional</span>'}</label>
+            <input type="text" id="dyn_${f.id}" placeholder="${esc(f.label || '')}"
+                   oninput="currentOrderDraft.details['${f.id}']=this.value;">
+          </div>`;
+      }
+    });
+  }
+
+  const homeDeliveryRow = Number(svc.homeDeliveryPrice) > 0 ? `
+    <div class="checkbox-row" onclick="toggleDelivery(this)">
+      <input type="checkbox" id="homeDeliveryChk" onclick="event.stopPropagation()">
+      <span>🚚 Home Delivery chahiye? (+₹${svc.homeDeliveryPrice})</span>
+    </div>` : '';
+
+  document.getElementById('mainContent').innerHTML = `
+    ${backRow('Services', 'goHome()')}
+    <div class="page-title">${SERVICE_ICONS[id] || '📋'} ${esc(svc.name || id)}</div>
+    <div class="page-sub">${esc(svc.description || '')}</div>
+
+    ${fieldsHtml}
+    ${homeDeliveryRow}
+
+    ${summaryAndSubmit(id)}
+  `;
+}
+
 // ── DELIVERY TOGGLE ───────────────────────────────────────────────────────
 function toggleDelivery(rowEl) {
   const chk = rowEl.querySelector('input[type=checkbox]');
@@ -646,7 +737,25 @@ document.addEventListener('click', () => { if (currentOrderDraft.service) recalc
 document.addEventListener('input', () => { if (currentOrderDraft.service) recalcSummary(currentOrderDraft.service); });
 
 // ── SUBMIT ORDER ───────────────────────────────────────────────────────────
+function validateDynamicRequiredFields() {
+  for (const f of currentDynamicFields) {
+    if (!f.required) continue;
+    if (f.type === 'photo') {
+      if (!currentOrderDraft.files[f.id]) return `"${f.label}" upload karna zaroori hai.`;
+    } else {
+      if (!currentOrderDraft.details[f.id]) return `"${f.label}" bharna zaroori hai.`;
+    }
+  }
+  return null;
+}
+
 async function submitOrder(serviceId) {
+  // For dynamically-built forms (new admin-added services), enforce required fields
+  if (!CUSTOM_FORM_SERVICES.includes(serviceId)) {
+    const missing = validateDynamicRequiredFields();
+    if (missing) { toast(missing, 'error'); return; }
+  }
+
   const { base, delivery, total } = calcAmount(serviceId);
 
   // Build subtype/extra fields based on service
@@ -680,6 +789,7 @@ async function submitOrder(serviceId) {
     const data = await res.json();
     if (!data.success) throw new Error(data.error || 'Order failed');
 
+    // Order place hote hi turant payment page khul jaata hai, amount ke saath
     renderPaymentPage(data.orderId, data.totalAmount, data.upiLink);
   } catch (e) {
     main.innerHTML = prevHtml;
@@ -711,6 +821,8 @@ function renderPaymentPage(orderId, amount, upiLink) {
 // ════════════════════════════════════════════════════════════════════════
 // MY ORDERS
 // ════════════════════════════════════════════════════════════════════════
+let myOrdersCache = [];
+
 async function renderMyOrders() {
   const main = document.getElementById('mainContent');
   main.innerHTML = `<div class="page-title">📦 My Orders</div><div class="spinner"></div>`;
@@ -719,6 +831,7 @@ async function renderMyOrders() {
     const res = await fetch(`${SCRIPT_URL}?action=getMyOrders&mobile=${session.mobile}`);
     const data = await res.json();
     if (!data.success) throw new Error(data.error);
+    myOrdersCache = data.orders;
 
     if (!data.orders.length) {
       main.innerHTML = `<div class="page-title">📦 My Orders</div><div class="empty-state"><h3>Koi order nahi mila</h3><p>Service select karke order karein</p></div>`;
@@ -731,6 +844,16 @@ async function renderMyOrders() {
         'Pending':'badge-pending','Accepted':'badge-accepted',
         'Rejected':'badge-rejected','Completed':'badge-completed'
       }[o.status] || 'badge-pending';
+
+      let files = {};
+      try { files = JSON.parse(o.files || '{}'); } catch(e) {}
+      const fileChips = Object.keys(files).map(k => {
+        const f = files[k];
+        const url = (f && typeof f === 'object') ? f.url : f;
+        const dl = (f && typeof f === 'object' && f.downloadUrl) ? f.downloadUrl : url;
+        if (!url) return '';
+        return `<a class="order-file-chip" href="${esc(dl)}" target="_blank">⬇ ${esc(FIELD_LABELS[k] || k)}</a>`;
+      }).join('');
 
       html += `
         <div class="order-card">
@@ -745,6 +868,10 @@ async function renderMyOrders() {
             <span>₹${o.totalAmount} · ${esc(o.paymentStatus)}</span>
             <span>${new Date(o.createdAt).toLocaleDateString()}</span>
           </div>
+          ${fileChips ? `<div class="order-files-row">${fileChips}</div>` : ''}
+          <div class="order-actions">
+            <button class="btn btn-ghost btn-sm" onclick="openAddFileModal('${esc(o.orderId)}')">📤 File Add Karein</button>
+          </div>
         </div>`;
     });
     main.innerHTML = html;
@@ -754,8 +881,54 @@ async function renderMyOrders() {
 }
 
 function serviceLabel(id) {
+  const s = (servicesCache || []).find(x => x.id === id);
+  if (s) return s.name;
   const labels = { photo_print:'Photo Print', pvc_card:'PVC Card Print', certificate:'Certificate', pan_card:'Pan Card', udyam:'Udyam Registration' };
   return labels[id] || id;
+}
+
+// ── User uploads an extra file onto one of their own existing orders ──────
+function openAddFileModal(orderId) {
+  activeAddFileOrderId = orderId;
+  document.getElementById('afOrderId').value = orderId;
+  document.getElementById('afLabel').value = '';
+  document.getElementById('afFile').value = '';
+  document.getElementById('afErr').textContent = '';
+  document.getElementById('addFileModal').classList.add('open');
+}
+function closeAddFileModal() { document.getElementById('addFileModal').classList.remove('open'); }
+
+async function submitAddFile() {
+  const fileInput = document.getElementById('afFile');
+  const label = document.getElementById('afLabel').value.trim();
+  const err = document.getElementById('afErr');
+  const file = fileInput.files[0];
+  if (!file) { err.textContent = 'File chunein.'; return; }
+  err.textContent = '';
+
+  try {
+    const { b64, mime } = await fileToBase64(file);
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'userUploadOrderFile',
+        orderId: activeAddFileOrderId,
+        mobile: session.mobile,
+        name: file.name,
+        mime,
+        data: b64,
+        label
+      })
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+    toast('File uploaded', 'success');
+    closeAddFileModal();
+    renderMyOrders();
+  } catch (e) {
+    err.textContent = e.message;
+  }
 }
 
 // ════════════════════════════════════════════════════════════════════════
@@ -773,58 +946,96 @@ async function renderUploadedFiles() {
   main.innerHTML = `<div class="page-title">🖼️ Uploaded Files</div><div class="page-sub">Aapke saare uploaded documents aur photos</div><div class="spinner"></div>`;
 
   try {
-    const res = await fetch(`${SCRIPT_URL}?action=getMyOrders&mobile=${session.mobile}`);
-    const data = await res.json();
+    const [ordersRes, sharedRes] = await Promise.all([
+      fetch(`${SCRIPT_URL}?action=getMyOrders&mobile=${session.mobile}`),
+      fetch(`${SCRIPT_URL}?action=getUserFiles&mobile=${session.mobile}`)
+    ]);
+    const data = await ordersRes.json();
+    const sharedData = await sharedRes.json();
     if (!data.success) throw new Error(data.error);
 
-    // Build a flat list of { url, thumb, label, orderId, service, date }
+    let html = '';
+    const sharedFiles = (sharedData.success ? sharedData.files : []) || [];
+
+    // ── Files admin uploaded directly for this user (not tied to an order) ──
+    if (sharedFiles.length) {
+      html += `<div class="page-title">🖼️ Uploaded Files</div><div class="page-sub">Admin ne aapke liye ye files share ki hain — yahan se download karein</div>`;
+      html += `<div class="file-group-title">📤 Admin ke Bheje Documents</div><div class="files-grid">`;
+      sharedFiles.forEach(f => {
+        html += `
+          <div class="file-card">
+            <img src="${esc(f.thumb)}" alt="${esc(f.label)}" loading="lazy" onerror="this.src='${esc(f.url)}'" onclick="openFileLightbox('${esc(f.url)}')">
+            <div class="file-card-info">
+              <div class="file-card-label">${esc(f.label)}</div>
+              <div class="file-card-sub">${new Date(f.uploadedAt).toLocaleDateString()}</div>
+            </div>
+            <div class="file-card-actions">
+              <a class="fca-view" href="${esc(f.url)}" target="_blank">👁 View</a>
+              <a class="fca-download" href="${esc(f.downloadUrl)}" target="_blank">⬇ Download</a>
+            </div>
+          </div>`;
+      });
+      html += `</div>`;
+    } else {
+      html += `<div class="page-title">🖼️ Uploaded Files</div><div class="page-sub">Aapke saare uploaded documents aur photos</div>`;
+    }
+
+    // Build a flat list of { url, downloadUrl, thumb, label, orderId, service, date, by }
     const allFiles = [];
     data.orders.forEach(o => {
       let files = {};
       try { files = JSON.parse(o.files || '{}'); } catch(e) {}
       Object.keys(files).forEach(key => {
         const f = files[key];
-        if (!f || !f.fileId) return;
+        if (!f) return;
+        const fileId = typeof f === 'object' ? f.fileId : null;
+        const url = (typeof f === 'object' ? f.url : f) || (fileId ? `https://drive.google.com/uc?export=view&id=${fileId}` : null);
+        if (!url) return;
+        const downloadUrl = (typeof f === 'object' && f.downloadUrl) ? f.downloadUrl : (fileId ? `https://drive.google.com/uc?export=download&id=${fileId}` : url);
+        const thumb = fileId ? `https://drive.google.com/thumbnail?id=${fileId}&sz=w400` : url;
         allFiles.push({
-          fileId: f.fileId,
-          url: f.url || `https://drive.google.com/uc?export=view&id=${f.fileId}`,
-          thumb: `https://drive.google.com/thumbnail?id=${f.fileId}&sz=w400`,
-          label: FIELD_LABELS[key] || key,
+          url, downloadUrl, thumb,
+          label: FIELD_LABELS[key] || key.replace(/^(admin_|user_)/,''),
           orderId: o.orderId,
           service: o.service,
-          date: o.createdAt
+          date: o.createdAt,
+          by: (typeof f === 'object' && f.by) ? f.by : (key.startsWith('admin_') ? 'admin' : 'user')
         });
       });
     });
 
-    if (!allFiles.length) {
+    if (!allFiles.length && !sharedFiles.length) {
       main.innerHTML = `<div class="page-title">🖼️ Uploaded Files</div><div class="empty-state"><h3>Koi file upload nahi hui</h3><p>Jab aap koi order karenge to uploaded documents yahan dikhenge</p></div>`;
       return;
     }
 
-    // Group by orderId, newest order first
-    const byOrder = {};
-    allFiles.forEach(f => { (byOrder[f.orderId] = byOrder[f.orderId] || []).push(f); });
-    const orderIds = Object.keys(byOrder).sort((a,b) => new Date(byOrder[b][0].date) - new Date(byOrder[a][0].date));
+    if (allFiles.length) {
+      // Group by orderId, newest order first
+      const byOrder = {};
+      allFiles.forEach(f => { (byOrder[f.orderId] = byOrder[f.orderId] || []).push(f); });
+      const orderIds = Object.keys(byOrder).sort((a,b) => new Date(byOrder[b][0].date) - new Date(byOrder[a][0].date));
 
-    let html = `<div class="page-title">🖼️ Uploaded Files</div><div class="page-sub">${allFiles.length} files across ${orderIds.length} orders</div>`;
-
-    orderIds.forEach(oid => {
-      const group = byOrder[oid];
-      const dateStr = new Date(group[0].date).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'});
-      html += `<div class="file-group-title">${esc(serviceLabel(group[0].service))} · ${esc(oid)} · ${dateStr}</div><div class="files-grid">`;
-      group.forEach(f => {
-        html += `
-          <div class="file-card" onclick="openFileLightbox('${esc(f.url)}')">
-            <img src="${esc(f.thumb)}" alt="${esc(f.label)}" loading="lazy" onerror="this.src='${esc(f.url)}'">
-            <div class="file-card-info">
-              <div class="file-card-label">${esc(f.label)}</div>
-              <div class="file-card-sub">${esc(oid)}</div>
-            </div>
-          </div>`;
+      orderIds.forEach(oid => {
+        const group = byOrder[oid];
+        const dateStr = new Date(group[0].date).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'});
+        html += `<div class="file-group-title">${esc(serviceLabel(group[0].service))} · ${esc(oid)} · ${dateStr}</div><div class="files-grid">`;
+        group.forEach(f => {
+          html += `
+            <div class="file-card">
+              <img src="${esc(f.thumb)}" alt="${esc(f.label)}" loading="lazy" onerror="this.src='${esc(f.url)}'" onclick="openFileLightbox('${esc(f.url)}')">
+              <div class="file-card-info">
+                <div class="file-card-label">${esc(f.label)} ${f.by==='admin' ? '👤' : ''}</div>
+                <div class="file-card-sub">${esc(oid)}</div>
+              </div>
+              <div class="file-card-actions">
+                <a class="fca-view" href="${esc(f.url)}" target="_blank">👁 View</a>
+                <a class="fca-download" href="${esc(f.downloadUrl)}" target="_blank">⬇ Download</a>
+              </div>
+            </div>`;
+        });
+        html += `</div>`;
       });
-      html += `</div>`;
-    });
+    }
 
     main.innerHTML = html;
   } catch (e) {
