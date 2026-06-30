@@ -1,967 +1,856 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PhotoDrive</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #0f0f11; --surface: #18181c; --surface2: #222228; --border: #2e2e38;
-      --accent: #7c6af7; --accent2: #a78bfa; --text: #e8e8f0; --muted: #8888a0;
-      --success: #34d399; --danger: #f87171; --radius: 14px; --radius-sm: 8px;
-      --shadow: 0 8px 32px rgba(0,0,0,.45);
-      --gold: #f5c842; --gold2: #fde68a;
-    }
-    body { background:var(--bg); color:var(--text); font-family:'Inter',system-ui,sans-serif; min-height:100vh; overflow-x:hidden; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ritesh Computer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    /* Light, multi-colour theme — each service / area gets its own hue */
+    --bg:#f6f4ef; --surface:#ffffff; --surface2:#f1eee6; --border:#e6e1d6;
+    --text:#221d12; --muted:#7c7565;
 
-    /* ── LOGIN SCREEN ─────────────────────────────────────────────────────── */
-    #loginScreen {
-      position:fixed; inset:0; z-index:1000;
-      background:var(--bg);
-      display:flex; align-items:center; justify-content:center;
-      padding:24px;
-    }
-    #loginScreen.hidden { display:none; }
+    /* Brand */
+    --brand1:#ff7a45;  /* warm orange  */
+    --brand2:#2563eb;  /* blue         */
+    --brand3:#16a34a;  /* green        */
+    --brand4:#9333ea;  /* purple       */
+    --brand5:#e11d48;  /* rose         */
+    --brand6:#0d9488;  /* teal         */
 
-    .login-card {
-      background:var(--surface);
-      border:1px solid var(--border);
-      border-radius:20px;
-      padding:44px 40px;
-      width:100%; max-width:420px;
-      box-shadow:var(--shadow);
-      text-align:center;
-    }
-    .login-logo {
-      width:64px; height:64px;
-      background:linear-gradient(135deg,var(--accent),var(--accent2));
-      border-radius:18px;
-      display:flex; align-items:center; justify-content:center;
-      margin:0 auto 24px;
-      box-shadow:0 8px 24px rgba(124,106,247,.35);
-    }
-    .login-card h1 { font-size:1.55rem; font-weight:700; letter-spacing:-.03em; margin-bottom:6px; }
-    .login-card h1 span { background:linear-gradient(135deg,var(--accent2),var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-    .login-card .subtitle { font-size:.875rem; color:var(--muted); margin-bottom:32px; }
+    --accent:#ff7a45; --accent2:#ffb085; --accent-deep:#e8601f;
+    --success:#16a34a; --danger:#e11d48; --info:#2563eb;
+    --radius:18px; --radius-sm:12px;
+    --shadow:0 10px 30px rgba(40,30,10,.10);
+  }
+  body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh;}
+  h1,h2,h3,.brand,.page-title,.content-title{font-family:'Baloo 2',system-ui,sans-serif;}
+  .hidden{display:none !important;}
+  button{font-family:inherit;}
 
-    .input-group { position:relative; margin-bottom:16px; text-align:left; }
-    .input-group label { display:block; font-size:.78rem; font-weight:600; color:var(--muted); margin-bottom:7px; letter-spacing:.04em; text-transform:uppercase; }
-    .phone-wrap { display:flex; gap:10px; }
-    .country-code {
-      background:var(--surface2); border:1.5px solid var(--border);
-      border-radius:var(--radius-sm); padding:0 14px;
-      font-size:.95rem; color:var(--text); font-weight:600;
-      display:flex; align-items:center; white-space:nowrap;
-      min-width:64px; justify-content:center;
-    }
-    .input-group input {
-      width:100%; background:var(--surface2);
-      border:1.5px solid var(--border); border-radius:var(--radius-sm);
-      padding:13px 16px; font-size:1.05rem; color:var(--text);
-      outline:none; transition:border-color .18s, box-shadow .18s;
-      letter-spacing:.06em;
-    }
-    .input-group input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(124,106,247,.18); }
-    .input-group input::placeholder { color:var(--border); letter-spacing:0; }
+  /* ── Topbar ─────────────────────────────────────────────────────────── */
+  .topbar{position:sticky;top:0;z-index:200;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;box-shadow:0 1px 0 rgba(0,0,0,.02);}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem;letter-spacing:-.01em;color:var(--text);}
+  .brand .mark{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--brand1),var(--brand5));display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 12px rgba(255,122,69,.35);}
+  .brand span{color:var(--brand2);}
+  .hamburger{background:var(--surface2);border:1px solid var(--border);width:40px;height:40px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);}
+  .hamburger:hover{background:var(--border);}
+  .topbar-right{display:flex;align-items:center;gap:10px;}
+  .topbar-user{font-size:.78rem;color:var(--muted);text-align:right;line-height:1.3;}
+  .topbar-user strong{display:block;color:var(--text);font-size:.85rem;}
 
-    .login-error { font-size:.82rem; color:var(--danger); margin-bottom:14px; min-height:18px; }
+  /* ── Side menu ──────────────────────────────────────────────────────── */
+  .overlay{position:fixed;inset:0;background:rgba(20,15,5,.4);z-index:300;opacity:0;pointer-events:none;transition:opacity .25s;}
+  .overlay.open{opacity:1;pointer-events:auto;}
+  .sidemenu{position:fixed;top:0;left:-300px;width:280px;height:100%;background:var(--surface);border-right:1px solid var(--border);z-index:301;transition:left .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;padding:22px 0;box-shadow:var(--shadow);}
+  .sidemenu.open{left:0;}
+  .sm-header{padding:0 22px 18px;border-bottom:1px solid var(--border);margin-bottom:10px;}
+  .sm-avatar{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--brand1),var(--brand5));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.2rem;color:#fff;margin-bottom:10px;}
+  .sm-name{font-weight:700;font-size:1rem;}
+  .sm-mobile{font-size:.8rem;color:var(--muted);}
+  .sm-item{display:flex;align-items:center;gap:12px;padding:13px 22px;color:var(--text);cursor:pointer;font-size:.92rem;font-weight:600;transition:background .15s;}
+  .sm-item:hover{background:var(--surface2);}
+  .sm-item.danger{color:var(--danger);margin-top:auto;border-top:1px solid var(--border);}
 
-    .btn-login {
-      width:100%; padding:14px; background:var(--accent);
-      color:#fff; border:none; border-radius:var(--radius-sm);
-      font-size:1rem; font-weight:700; cursor:pointer;
-      transition:all .18s; letter-spacing:.01em;
-      display:flex; align-items:center; justify-content:center; gap:8px;
-    }
-    .btn-login:hover { background:#6b58f0; transform:translateY(-1px); box-shadow:0 6px 20px rgba(124,106,247,.45); }
-    .btn-login:active { transform:translateY(0); }
-    .btn-login:disabled { opacity:.55; cursor:not-allowed; transform:none; box-shadow:none; }
+  main{max-width:760px;margin:0 auto;padding:22px 16px 80px;}
 
-    .login-note { font-size:.78rem; color:var(--muted); margin-top:18px; }
-    .login-note strong { color:var(--text); }
+  /* ── Login screen ───────────────────────────────────────────────────── */
+  #loginScreen{min-height:calc(100vh - 64px);display:flex;align-items:center;justify-content:center;padding:20px;}
+  .login-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:38px 30px;width:100%;max-width:400px;box-shadow:var(--shadow);}
+  .login-logo{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--brand1),var(--brand5));display:flex;align-items:center;justify-content:center;font-size:1.7rem;margin:0 auto 18px;box-shadow:0 8px 22px rgba(255,122,69,.35);}
+  .login-card h1{text-align:center;font-size:1.5rem;margin-bottom:4px;color:var(--text);}
+  .login-card .sub{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:26px;}
+  .field{margin-bottom:16px;text-align:left;}
+  .field label{display:block;font-size:.76rem;font-weight:700;color:var(--muted);margin-bottom:7px;text-transform:uppercase;letter-spacing:.04em;}
+  .field input,.field select,.field textarea{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;font-size:1rem;color:var(--text);outline:none;transition:border-color .15s,box-shadow .15s;}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--brand2);box-shadow:0 0 0 3px rgba(37,99,235,.13);background:var(--surface);}
+  .phone-row{display:flex;gap:8px;}
+  .cc{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:0 14px;display:flex;align-items:center;font-weight:700;font-size:.95rem;min-width:62px;justify-content:center;}
+  .err-text{color:var(--danger);font-size:.8rem;min-height:18px;margin-bottom:8px;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 20px;border-radius:var(--radius-sm);font-size:.95rem;font-weight:700;cursor:pointer;border:none;transition:all .18s;width:100%;}
+  .btn-accent{background:linear-gradient(135deg,var(--brand1),var(--accent-deep));color:#fff;}
+  .btn-accent:hover{filter:brightness(1.06);transform:translateY(-1px);box-shadow:0 8px 22px rgba(255,122,69,.4);}
+  .btn-accent:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none;}
+  .btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+  .btn-ghost:hover{background:var(--border);}
+  .btn-outline{background:transparent;border:1.5px solid var(--brand2);color:var(--brand2);}
 
-    /* ── MAIN APP ─────────────────────────────────────────────────────────── */
-    #app { display:none; }
-    #app.visible { display:block; }
+  /* ── Sections / cards ───────────────────────────────────────────────── */
+  .page-title{font-size:1.4rem;font-weight:800;margin-bottom:4px;color:var(--text);}
+  .page-sub{color:var(--muted);font-size:.85rem;margin-bottom:22px;}
+  .back-row{display:flex;align-items:center;gap:10px;margin-bottom:18px;cursor:pointer;color:var(--muted);font-size:.85rem;font-weight:600;}
+  .back-row:hover{color:var(--brand2);}
 
-    /* Header */
-    header { position:sticky; top:0; z-index:100; background:rgba(15,15,17,.9); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:0 28px; height:68px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
-    .logo { display:flex; align-items:center; gap:10px; font-size:1.15rem; font-weight:700; letter-spacing:-.02em; }
-    .logo span { background:linear-gradient(135deg,var(--accent2),var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-    .header-right { display:flex; align-items:center; gap:12px; }
+  .service-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:480px){.service-grid{grid-template-columns:1fr;}}
+  .service-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;border-top:4px solid var(--card-color,var(--brand1));}
+  .service-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
+  .service-icon{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:1.45rem;margin-bottom:14px;background:var(--card-color-soft,#fff0e8);}
+  .service-card h3{font-size:1rem;margin-bottom:4px;color:var(--text);}
+  .service-card p{font-size:.78rem;color:var(--muted);margin-bottom:10px;line-height:1.4;}
+  .service-price{font-size:.82rem;font-weight:800;color:var(--card-color,var(--brand1));}
 
-    /* User chip */
-    .user-chip {
-      display:flex; align-items:center; gap:8px;
-      background:var(--surface2); border:1px solid var(--border);
-      border-radius:99px; padding:6px 14px 6px 8px;
-      font-size:.82rem;
-    }
-    .user-avatar {
-      width:26px; height:26px; background:linear-gradient(135deg,var(--accent),var(--accent2));
-      border-radius:50%; display:flex; align-items:center; justify-content:center;
-      font-size:.7rem; font-weight:700; color:#fff; flex-shrink:0;
-    }
-    .user-mobile { color:var(--text); font-weight:600; font-size:.83rem; }
-    .btn-logout { background:transparent; border:none; color:var(--muted); font-size:.75rem; cursor:pointer; padding:0 0 0 6px; transition:color .15s; }
-    .btn-logout:hover { color:var(--danger); }
+  .option-row{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+  .option-pill{flex:1;min-width:120px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center;cursor:pointer;font-size:.88rem;font-weight:700;transition:all .15s;color:var(--text);}
+  .option-pill.selected{border-color:var(--brand2);background:rgba(37,99,235,.08);color:var(--brand2);}
 
-    /* Buttons */
-    .btn { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; border-radius:var(--radius-sm); font-size:.875rem; font-weight:600; cursor:pointer; border:none; transition:all .18s; white-space:nowrap; }
-    .btn-primary { background:var(--accent); color:#fff; }
-    .btn-primary:hover { background:#6b58f0; transform:translateY(-1px); box-shadow:0 4px 16px rgba(124,106,247,.4); }
-    .btn-ghost { background:var(--surface2); color:var(--text); border:1px solid var(--border); }
-    .btn-ghost:hover { background:var(--border); }
-    .btn:disabled { opacity:.5; cursor:not-allowed; transform:none !important; }
+  .upload-box{border:2px dashed var(--border);border-radius:var(--radius-sm);padding:22px 16px;text-align:center;cursor:pointer;position:relative;background:var(--surface2);margin-bottom:14px;transition:all .15s;}
+  .upload-box:hover{border-color:var(--brand2);}
+  .upload-box input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+  .upload-box .ub-label{font-size:.85rem;font-weight:700;margin-bottom:2px;color:var(--text);}
+  .upload-box .ub-sub{font-size:.74rem;color:var(--muted);}
+  .upload-box.has-file{border-color:var(--success);border-style:solid;background:rgba(22,163,74,.05);}
+  .upload-preview{width:100%;max-height:140px;object-fit:contain;border-radius:8px;margin-top:8px;}
+  .optional-tag{font-size:.68rem;background:var(--surface2);color:var(--muted);padding:2px 8px;border-radius:99px;margin-left:6px;font-weight:600;border:1px solid var(--border);}
 
-    /* View toggle */
-    .view-toggle { display:flex; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); overflow:hidden; }
-    .view-btn { padding:8px 12px; background:transparent; border:none; color:var(--muted); cursor:pointer; display:flex; align-items:center; transition:all .15s; }
-    .view-btn.active { background:var(--accent); color:#fff; }
-    .view-btn:hover:not(.active) { color:var(--text); background:var(--border); }
+  .checkbox-row{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:16px;cursor:pointer;}
+  .checkbox-row input{width:18px;height:18px;accent-color:var(--brand1);}
 
-    main { max-width:1400px; margin:0 auto; padding:32px 24px 80px; }
+  .summary-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin:20px 0;}
+  .summary-row{display:flex;justify-content:space-between;font-size:.86rem;padding:5px 0;color:var(--muted);}
+  .summary-row.total{border-top:1px solid var(--border);margin-top:6px;padding-top:10px;font-weight:800;color:var(--text);font-size:1.05rem;}
 
-    /* Upload zone */
-    .upload-zone { border:2px dashed var(--border); border-radius:var(--radius); padding:36px 24px; text-align:center; cursor:pointer; transition:all .2s; background:var(--surface); margin-bottom:28px; position:relative; }
-    .upload-zone.drag-over { border-color:var(--accent); background:rgba(124,106,247,.08); box-shadow:0 0 0 4px rgba(124,106,247,.15); }
-    .upload-zone input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
-    .upload-icon { width:50px; height:50px; background:var(--surface2); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; }
-    .upload-zone h3 { font-size:1rem; font-weight:600; margin-bottom:5px; }
-    .upload-zone p  { font-size:.83rem; color:var(--muted); }
+  /* ── Payment page ───────────────────────────────────────────────────── */
+  .pay-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;text-align:center;}
+  .pay-amount{font-size:2.2rem;font-weight:800;color:var(--brand1);margin:10px 0 4px;}
+  .pay-orderid{font-size:.78rem;color:var(--muted);margin-bottom:20px;}
+  #qrCanvas{background:#fff;padding:14px;border-radius:14px;display:inline-block;margin-bottom:18px;border:1px solid var(--border);}
+  .pay-note{font-size:.78rem;color:var(--muted);margin:14px 0;line-height:1.5;}
 
-    /* Progress */
-    .upload-progress { margin-top:14px; display:none; }
-    .upload-progress.visible { display:block; }
-    .progress-bar-wrap { height:5px; background:var(--surface2); border-radius:99px; overflow:hidden; margin-top:8px; }
-    .progress-bar-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:99px; width:0%; transition:width .25s ease; }
-    #uploadStatus { font-size:.82rem; color:var(--muted); }
+  /* ── Orders list ────────────────────────────────────────────────────── */
+  .order-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:12px;}
+  .order-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+  .order-service{font-weight:700;font-size:.95rem;color:var(--text);}
+  .order-id{font-size:.72rem;color:var(--muted);}
+  .badge{font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:99px;white-space:nowrap;}
+  .badge-pending{background:rgba(37,99,235,.1);color:var(--info);}
+  .badge-accepted{background:rgba(22,163,74,.1);color:var(--success);}
+  .badge-rejected{background:rgba(225,29,72,.1);color:var(--danger);}
+  .badge-completed{background:rgba(255,122,69,.12);color:var(--brand1);}
+  .order-meta{font-size:.8rem;color:var(--muted);display:flex;justify-content:space-between;margin-top:8px;}
 
-    /* Toolbar */
-    .toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:24px; flex-wrap:wrap; }
-    .count-badge { font-size:.85rem; color:var(--muted); background:var(--surface2); border:1px solid var(--border); padding:6px 14px; border-radius:99px; }
-    .count-badge strong { color:var(--text); }
+  /* ── Uploaded Files page ───────────────────────────────────────────── */
+  .files-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+  @media(max-width:480px){.files-grid{grid-template-columns:repeat(2,1fr);gap:10px;}}
+  .file-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s;}
+  .file-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+  .file-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:var(--surface2);}
+  .file-card-info{padding:9px 10px;}
+  .file-card-label{font-size:.72rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .file-card-sub{font-size:.66rem;color:var(--muted);margin-top:1px;}
+  .file-group-title{font-size:.78rem;font-weight:800;color:var(--brand2);text-transform:uppercase;letter-spacing:.03em;margin:22px 0 10px;display:flex;align-items:center;gap:8px;}
+  .file-group-title:first-child{margin-top:0;}
+  .file-lightbox{position:fixed;inset:0;z-index:600;background:rgba(20,15,5,.85);display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px);}
+  .file-lightbox.open{display:flex;}
+  .file-lightbox img{max-width:92vw;max-height:88vh;border-radius:14px;box-shadow:var(--shadow);}
+  .file-lightbox-close{position:fixed;top:18px;right:18px;background:rgba(255,255,255,.92);border:none;width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 
-    /* Gallery */
-    #gallery { columns:4; column-gap:14px; }
-    #gallery.cols-3 { columns:3; }
-    #gallery.cols-2 { columns:2; }
-    #gallery.list-view { columns:1; }
-    @media(max-width:1100px){ #gallery{ columns:3; } }
-    @media(max-width:768px) { #gallery{ columns:2; } header { padding:0 16px; } }
-    @media(max-width:480px) { #gallery{ columns:1; } }
+  .empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
+  .empty-state h3{color:var(--text);margin-bottom:6px;font-size:1.05rem;}
 
-    .photo-card { break-inside:avoid; margin-bottom:14px; border-radius:var(--radius); overflow:hidden; background:var(--surface); border:1px solid var(--border); cursor:pointer; transition:transform .2s,box-shadow .2s; position:relative; }
-    .photo-card:hover { transform:translateY(-3px); box-shadow:var(--shadow); }
-    .photo-card:hover .card-overlay { opacity:1; }
-    .photo-card img { width:100%; display:block; object-fit:cover; }
-    .card-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(0,0,0,.75) 0%,transparent 55%); opacity:0; transition:opacity .2s; display:flex; align-items:flex-end; padding:14px; }
-    .card-name { font-size:.82rem; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .card-date { font-size:.72rem; color:rgba(255,255,255,.6); margin-top:2px; }
+  .toast-container{position:fixed;bottom:20px;right:16px;left:16px;z-index:999;display:flex;flex-direction:column;align-items:center;gap:8px;}
+  .toast{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 18px;font-size:.86rem;box-shadow:var(--shadow);max-width:400px;width:100%;text-align:center;animation:up .2s ease;color:var(--text);}
+  .toast.success{border-left:3px solid var(--success);}
+  .toast.error{border-left:3px solid var(--danger);}
+  @keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-    /* List view */
-    #gallery.list-view .photo-card { display:flex; align-items:center; gap:16px; padding:10px 16px; break-inside:auto; margin-bottom:8px; }
-    #gallery.list-view .photo-card img { width:70px; height:70px; object-fit:cover; border-radius:var(--radius-sm); flex-shrink:0; }
-    #gallery.list-view .card-overlay { display:none; }
-    #gallery.list-view .list-info { display:block !important; }
-    .list-info { display:none; }
-    .list-info .card-name { color:var(--text); font-size:.9rem; }
-    .list-info .card-date { color:var(--muted); }
-
-    /* Lightbox */
-    .lightbox { position:fixed; inset:0; z-index:500; background:rgba(0,0,0,.92); display:none; align-items:center; justify-content:center; backdrop-filter:blur(8px); }
-    .lightbox.open { display:flex; }
-    .lightbox-content { max-width:92vw; max-height:92vh; }
-    .lightbox-content img { max-width:90vw; max-height:88vh; object-fit:contain; border-radius:var(--radius); box-shadow:var(--shadow); display:block; }
-    .lightbox-close { position:fixed; top:20px; right:24px; background:rgba(255,255,255,.1); border:none; color:#fff; width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.3rem; transition:background .15s; }
-    .lightbox-close:hover { background:rgba(255,255,255,.25); }
-    .lightbox-nav { position:fixed; top:50%; transform:translateY(-50%); background:rgba(255,255,255,.1); border:none; color:#fff; width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.6rem; transition:background .15s; }
-    .lightbox-nav:hover { background:rgba(255,255,255,.25); }
-    .lightbox-prev { left:14px; } .lightbox-next { right:14px; }
-    .lightbox-caption { position:fixed; bottom:22px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,.6); padding:8px 20px; border-radius:99px; font-size:.82rem; color:rgba(255,255,255,.8); backdrop-filter:blur(4px); white-space:nowrap; max-width:80vw; overflow:hidden; text-overflow:ellipsis; }
-
-    /* Toast */
-    .toast-container { position:fixed; bottom:24px; right:24px; z-index:999; display:flex; flex-direction:column; gap:10px; }
-    .toast { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 18px; font-size:.875rem; box-shadow:var(--shadow); display:flex; align-items:center; gap:10px; animation:slideIn .2s ease; min-width:240px; }
-    .toast.success { border-left:3px solid var(--success); }
-    .toast.error   { border-left:3px solid var(--danger); }
-    @keyframes slideIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
-
-    /* State */
-    .state-msg { text-align:center; padding:80px 24px; color:var(--muted); grid-column:1/-1; }
-    .state-msg h3 { font-size:1.1rem; font-weight:600; color:var(--text); margin-bottom:8px; }
-    .state-msg p  { font-size:.875rem; }
-    .spinner { width:36px; height:36px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; margin:0 auto 16px; }
-    @keyframes spin { to{transform:rotate(360deg)} }
-
-    /* ── PAYMENT PAGE ─────────────────────────────────────────────────────── */
-    #paymentPage {
-      position: fixed; inset: 0; z-index: 800;
-      background: var(--bg);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      overflow-y: auto;
-      animation: fadeInPage .4s ease;
-    }
-    #paymentPage.open { display: flex; }
-    @keyframes fadeInPage {
-      from { opacity: 0; transform: scale(.97); }
-      to   { opacity: 1; transform: scale(1); }
-    }
-
-    .payment-card {
-      width: 100%;
-      max-width: 860px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 24px 64px rgba(0,0,0,.7);
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      min-height: 540px;
-      animation: slideUp .45s cubic-bezier(.22,1,.36,1);
-    }
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(40px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @media(max-width: 680px) {
-      .payment-card { grid-template-columns: 1fr; }
-      .payment-preview-panel { min-height: 220px; }
-    }
-
-    /* Left — preview panel */
-    .payment-preview-panel {
-      position: relative;
-      background: #111115;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      min-height: 380px;
-    }
-    .preview-bg-blur {
-      position: absolute; inset: 0;
-      background-image: url('https://drive.google.com/thumbnail?id=1Kb8rvQD9K_iUmADA5_WE7SEfKtlqxWLe&sz=w800');
-      background-size: cover; background-position: center;
-      filter: blur(22px) brightness(.35) saturate(1.4);
-      transform: scale(1.1);
-    }
-    .preview-frame {
-      position: relative; z-index: 2;
-      width: 120px;
-      height: auto;
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 8px 28px rgba(0,0,0,.7), 0 0 0 2px rgba(255,255,255,.12);
-      cursor: pointer;
-      transition: transform .2s, box-shadow .2s;
-    }
-    .preview-frame:hover {
-      transform: scale(1.03);
-      box-shadow: 0 12px 36px rgba(0,0,0,.85), 0 0 0 3px rgba(255,255,255,.2);
-    }
-    .preview-frame img {
-      display: block;
-      width: 100%; height: auto;
-      object-fit: cover;
-      border-radius: 14px;
-    }
-    .preview-badge {
-      position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
-      z-index: 3;
-      background: rgba(0,0,0,.55);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 99px;
-      padding: 6px 16px;
-      font-size: .75rem;
-      color: rgba(255,255,255,.75);
-      white-space: nowrap;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .preview-badge::before {
-      content: '';
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--success);
-      box-shadow: 0 0 6px var(--success);
-      flex-shrink: 0;
-    }
-
-    /* Right — details panel */
-    .payment-details-panel {
-      padding: 40px 36px;
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      border-left: 1px solid var(--border);
-    }
-    @media(max-width: 680px) {
-      .payment-details-panel { padding: 28px 24px; border-left: none; border-top: 1px solid var(--border); }
-    }
-
-    .pay-eyebrow {
-      font-size: .72rem;
-      font-weight: 700;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: var(--accent2);
-      margin-bottom: 10px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .pay-eyebrow::before {
-      content: '';
-      width: 18px; height: 2px;
-      background: var(--accent2);
-      border-radius: 2px;
-      flex-shrink: 0;
-    }
-
-    .pay-headline {
-      font-size: 1.55rem;
-      font-weight: 800;
-      letter-spacing: -.03em;
-      line-height: 1.22;
-      margin-bottom: 6px;
-      color: var(--text);
-    }
-    .pay-headline .gold-text {
-      background: linear-gradient(135deg, var(--gold), var(--gold2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .pay-subtext {
-      font-size: .85rem;
-      color: var(--muted);
-      margin-bottom: 28px;
-      line-height: 1.55;
-    }
-
-    /* Order summary */
-    .order-summary {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 18px 20px;
-      margin-bottom: 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .order-row {
-      display: flex; align-items: center; justify-content: space-between;
-      font-size: .875rem;
-    }
-    .order-row .label { color: var(--muted); }
-    .order-row .value { color: var(--text); font-weight: 600; }
-    .order-divider { height: 1px; background: var(--border); margin: 2px 0; }
-    .order-row.total .label { color: var(--text); font-weight: 700; font-size: .95rem; }
-    .order-row.total .value {
-      font-size: 1.1rem; font-weight: 800;
-      background: linear-gradient(135deg, var(--gold), var(--gold2));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
-
-    /* UPI / payment options */
-    .pay-method-label {
-      font-size: .75rem; font-weight: 700; letter-spacing: .07em;
-      text-transform: uppercase; color: var(--muted);
-      margin-bottom: 10px;
-    }
-    .pay-methods {
-      display: flex; gap: 8px; flex-wrap: wrap;
-      margin-bottom: 22px;
-    }
-    .pay-method-chip {
-      display: flex; align-items: center; gap: 6px;
-      padding: 7px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 99px;
-      background: var(--surface2);
-      font-size: .78rem; font-weight: 600; color: var(--text);
-      cursor: pointer;
-      transition: all .17s;
-      user-select: none;
-    }
-    .pay-method-chip:hover,
-    .pay-method-chip.selected { border-color: var(--accent); background: rgba(124,106,247,.12); color: var(--accent2); }
-    .pay-method-chip .chip-icon { font-size: 1rem; }
-
-    /* CTA button */
-    .btn-pay {
-      width: 100%;
-      padding: 16px;
-      border: none;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--gold) 0%, #f0a500 100%);
-      color: #1a1200;
-      font-size: 1.05rem;
-      font-weight: 800;
-      cursor: pointer;
-      letter-spacing: .01em;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      transition: all .2s;
-      box-shadow: 0 6px 24px rgba(245,200,66,.35);
-      position: relative;
-      overflow: hidden;
-    }
-    .btn-pay::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(to right, transparent 0%, rgba(255,255,255,.18) 50%, transparent 100%);
-      transform: translateX(-100%);
-      transition: transform .5s ease;
-    }
-    .btn-pay:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(245,200,66,.5); }
-    .btn-pay:hover::after { transform: translateX(100%); }
-    .btn-pay:active { transform: translateY(0); }
-
-    .pay-secure-note {
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-      margin-top: 12px;
-      font-size: .72rem; color: var(--muted);
-    }
-    .pay-secure-note svg { flex-shrink: 0; }
-
-    /* Skip / back link */
-    .pay-skip {
-      text-align: center;
-      margin-top: 16px;
-    }
-    .pay-skip button {
-      background: none; border: none; color: var(--muted);
-      font-size: .8rem; cursor: pointer; text-decoration: underline;
-      transition: color .15s;
-    }
-    .pay-skip button:hover { color: var(--text); }
-
-    /* Image Preview Overlay (enlarge on click) */
-    .image-preview-overlay {
-      position: fixed; inset: 0; z-index: 900;
-      background: rgba(0,0,0,.92);
-      backdrop-filter: blur(6px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-    .image-preview-overlay.open {
-      display: flex;
-    }
-    .image-preview-overlay img {
-      max-width: 94vw;
-      max-height: 94vh;
-      object-fit: contain;
-      border-radius: 12px;
-      box-shadow: 0 0 30px rgba(0,0,0,.8);
-    }
-    .image-preview-close {
-      position: fixed; top: 24px; right: 28px;
-      background: rgba(255,255,255,.15);
-      border: none; color: #fff;
-      width: 44px; height: 44px; border-radius: 50%;
-      font-size: 1.3rem; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      z-index: 910;
-      transition: background .2s;
-    }
-    .image-preview-close:hover { background: rgba(255,255,255,.3); }
-  </style>
+  .spinner{width:30px;height:30px;border:3px solid var(--border);border-top-color:var(--brand1);border-radius:50%;animation:spin .7s linear infinite;margin:30px auto;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
 </head>
 <body>
 
-<!-- ── LOGIN SCREEN ──────────────────────────────────────────────────────── -->
+<!-- ════ LOGIN SCREEN ════ -->
 <div id="loginScreen">
   <div class="login-card">
-    <div class="login-logo">
-      <svg width="32" height="32" viewBox="0 0 28 28" fill="none">
-        <path d="M7 19l5-6 3.5 4.5L19 11l5 8H4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="18.5" cy="9.5" r="2" fill="#fff" opacity=".8"/>
-      </svg>
-    </div>
-    <h1>Photo<span>Drive</span></h1>
-    <p class="subtitle">Enter your mobile number to access your gallery</p>
+    <div class="login-logo">💻</div>
+    <h1>Ritesh Computer</h1>
+    <p class="sub">Apna mobile number daalein</p>
 
-    <div class="input-group">
-      <label>Mobile Number</label>
-      <div class="phone-wrap">
-        <div class="country-code">🇮🇳 +91</div>
-        <input type="tel" id="mobileInput" placeholder="9876543210" maxlength="10"
-               inputmode="numeric" pattern="[0-9]*"
-               onkeydown="if(event.key==='Enter') doLogin()"
-               oninput="this.value=this.value.replace(/\D/g,'')">
-      </div>
-    </div>
-
-    <div class="login-error" id="loginError"></div>
-
-    <button class="btn-login" id="loginBtn" onclick="doLogin()">
-      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-      Enter My Gallery
-    </button>
-
-    <p class="login-note">No password needed — your mobile number is your identity.<br>You'll only see <strong>your own photos</strong>.</p>
-  </div>
-</div>
-
-<!-- ── MAIN APP ──────────────────────────────────────────────────────────── -->
-<div id="app">
-  <header>
-    <div class="logo">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-        <rect width="28" height="28" rx="8" fill="url(#lg)"/>
-        <path d="M7 19l5-6 3.5 4.5L19 11l5 8H4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="18.5" cy="9.5" r="2" fill="#fff" opacity=".8"/>
-        <defs><linearGradient id="lg" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#7c6af7"/><stop offset="1" stop-color="#a78bfa"/></linearGradient></defs>
-      </svg>
-      <span>PhotoDrive</span>
-    </div>
-    <div class="header-right">
-      <div class="view-toggle">
-        <button class="view-btn active" id="grid4Btn" title="4-col" onclick="setView('grid4')">
-          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
-        </button>
-        <button class="view-btn" id="grid3Btn" title="3-col" onclick="setView('grid3')">
-          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><rect x="1" y="1" width="4" height="6" rx="1"/><rect x="6" y="1" width="4" height="6" rx="1"/><rect x="11" y="1" width="4" height="6" rx="1"/><rect x="1" y="9" width="4" height="6" rx="1"/><rect x="6" y="9" width="4" height="6" rx="1"/><rect x="11" y="9" width="4" height="6" rx="1"/></svg>
-        </button>
-        <button class="view-btn" id="listBtn" title="List" onclick="setView('list')">
-          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="3" rx="1"/><rect x="1" y="7" width="14" height="3" rx="1"/><rect x="1" y="12" width="14" height="3" rx="1"/></svg>
-        </button>
-      </div>
-      <div class="user-chip">
-        <div class="user-avatar" id="userAvatar">?</div>
-        <span class="user-mobile" id="userMobileDisplay"></span>
-        <button class="btn-logout" onclick="doLogout()" title="Logout">✕ Logout</button>
-      </div>
-      <button class="btn btn-primary" onclick="triggerUpload()">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 5v14M5 12l7-7 7 7"/></svg>
-        Upload
-      </button>
-    </div>
-  </header>
-
-  <main>
-    <div class="upload-zone" id="uploadZone">
-      <input type="file" id="fileInput" accept="image/*" multiple onchange="handleFiles(this.files)">
-      <div class="upload-icon">
-        <svg width="24" height="24" fill="none" stroke="#a78bfa" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      </div>
-      <h3>Drag &amp; drop photos here or click to browse</h3>
-      <p>JPG · PNG · GIF · WebP · Multiple files supported</p>
-      <div class="upload-progress" id="uploadProgress">
-        <div id="uploadStatus">Preparing…</div>
-        <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressFill"></div></div>
-      </div>
-    </div>
-
-    <div class="toolbar">
-      <span class="count-badge" id="countBadge"><strong>—</strong> photos</span>
-      <button class="btn btn-ghost" onclick="loadPhotos()" id="refreshBtn">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-        Refresh
-      </button>
-    </div>
-
-    <div id="gallery">
-      <div class="state-msg"><div class="spinner"></div><h3>Loading your photos…</h3></div>
-    </div>
-  </main>
-</div>
-
-<!-- ── PAYMENT PAGE ──────────────────────────────────────────────────────── -->
-<div id="paymentPage">
-  <div class="payment-card">
-    <!-- Left: Small Image Preview -->
-    <div class="payment-preview-panel">
-      <div class="preview-bg-blur"></div>
-      <div class="preview-frame" onclick="enlargePreview()" title="Click to enlarge">
-        <img
-          id="paymentPreviewImg"
-          src="https://drive.google.com/thumbnail?id=1Kb8rvQD9K_iUmADA5_WE7SEfKtlqxWLe&sz=w600"
-          alt="Your Photo Print Preview"
-          onerror="this.src='https://lh3.googleusercontent.com/d/1Kb8rvQD9K_iUmADA5_WE7SEfKtlqxWLe=w600'"
-        >
-      </div>
-      <div class="preview-badge">
-        <span>Print-ready · HD Quality</span>
-      </div>
-    </div>
-
-    <!-- Right: Payment Details -->
-    <div class="payment-details-panel">
-      <div class="pay-eyebrow">Order Summary</div>
-      <h2 class="pay-headline">
-        Complete Payment to Book Your<br>
-        <span class="gold-text">Photo Print Order</span>
-      </h2>
-      <p class="pay-subtext">Your photo has been uploaded successfully. Place your print order now and we'll deliver a studio-quality print to your door.</p>
-
-      <div class="order-summary">
-        <div class="order-row">
-          <span class="label">Photo Print (6×4 in)</span>
-          <span class="value">₹50</span>
-        </div>
-        <div class="order-divider"></div>
-        <div class="order-row total">
-          <span class="label">Total</span>
-          <span class="value">₹50</span>
+    <div id="step1">
+      <div class="field">
+        <label>Mobile Number</label>
+        <div class="phone-row">
+          <div class="cc">🇮🇳 +91</div>
+          <input type="tel" id="loginMobile" placeholder="9876543210" maxlength="10" inputmode="numeric"
+                 oninput="this.value=this.value.replace(/\D/g,'')" onkeydown="if(event.key==='Enter') checkMobile()">
         </div>
       </div>
+      <div class="err-text" id="loginErr1"></div>
+      <button class="btn btn-accent" id="checkBtn" onclick="checkMobile()">Continue</button>
+    </div>
 
-      <div class="pay-method-label">Pay via</div>
-      <div class="pay-methods">
-        <div class="pay-method-chip selected" onclick="selectMethod(this)">
-          <span class="chip-icon">📱</span> UPI
-        </div>
-        <div class="pay-method-chip" onclick="selectMethod(this)">
-          <span class="chip-icon">💳</span> Card
-        </div>
-        <div class="pay-method-chip" onclick="selectMethod(this)">
-          <span class="chip-icon">🏦</span> Net Banking
-        </div>
-        <div class="pay-method-chip" onclick="selectMethod(this)">
-          <span class="chip-icon">💰</span> Wallet
-        </div>
+    <div id="step2" class="hidden">
+      <div class="field">
+        <label>Aapka Naam</label>
+        <input type="text" id="loginName" placeholder="Full name likhein" onkeydown="if(event.key==='Enter') doRegister()">
       </div>
-
-      <button class="btn-pay" onclick="handlePayment()">
-        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg>
-        Pay ₹50 &amp; Confirm Order
-      </button>
-
-      <div class="pay-secure-note">
-        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        100% Secure · Encrypted Payment · Cancel Anytime
-      </div>
-
-      <div class="pay-skip">
-        <button onclick="closePaymentPage()">Skip for now, go back to gallery</button>
-      </div>
+      <div class="err-text" id="loginErr2"></div>
+      <button class="btn btn-accent" id="registerBtn" onclick="doRegister()">Submit aur Login Karein</button>
     </div>
   </div>
 </div>
 
-<!-- Image preview overlay (fullscreen) -->
-<div class="image-preview-overlay" id="imagePreviewOverlay" onclick="closeImagePreview()">
-  <img id="imagePreviewLarge" src="" alt="Large preview">
-  <button class="image-preview-close" onclick="closeImagePreview()">✕</button>
+<!-- ════ MAIN APP ════ -->
+<div id="app" class="hidden">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="hamburger" onclick="openMenu()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="brand"><div class="mark">💻</div>Ritesh <span>Computer</span></div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-user"><strong id="topUserName">—</strong><span id="topUserMobile"></span></div>
+    </div>
+  </div>
+
+  <main id="mainContent"></main>
 </div>
 
-<!-- Lightbox -->
-<div class="lightbox" id="lightbox">
-  <div class="lightbox-content"><img id="lightboxImg" src="" alt=""></div>
-  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
-  <button class="lightbox-nav lightbox-prev" onclick="navigate(-1)">‹</button>
-  <button class="lightbox-nav lightbox-next" onclick="navigate(1)">›</button>
-  <div class="lightbox-caption" id="lightboxCaption"></div>
+<!-- ════ SIDE MENU ════ -->
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>
+<div class="sidemenu" id="sidemenu">
+  <div class="sm-header">
+    <div class="sm-avatar" id="smAvatar">?</div>
+    <div class="sm-name" id="smName">—</div>
+    <div class="sm-mobile" id="smMobile"></div>
+  </div>
+  <div class="sm-item" onclick="goHome()">🏠 &nbsp;Home / Services</div>
+  <div class="sm-item" onclick="goMyOrders()">📦 &nbsp;My Orders</div>
+  <div class="sm-item" onclick="goUploadedFiles()">🖼️ &nbsp;Uploaded Files</div>
+  <div class="sm-item danger" onclick="doLogout()">🚪 &nbsp;Logout</div>
+</div>
+
+<!-- ════ FILE LIGHTBOX ════ -->
+<div class="file-lightbox" id="fileLightbox" onclick="closeFileLightbox(event)">
+  <button class="file-lightbox-close" onclick="closeFileLightbox(event)">✕</button>
+  <img id="fileLightboxImg" src="" alt="">
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-  // ─── CONFIG ───────────────────────────────────────────────────────────────────
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxPaLKh8xoVVSR53PFOV3P1zprwTQvtdPET8ZoJdas9xN5v5yYeta4MBmd6TBUYobHY/exec';
-  const PRINT_PREVIEW_FILE_ID = '1Kb8rvQD9K_iUmADA5_WE7SEfKtlqxWLe';
+// ════════════════════════════════════════════════════════════════════════════
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyF8Ie_z8G1ByLlzbokZHcAZ9ZpezuLXpVG-OLNFGYMJuu5ftI5fGVDWQu_sl6Ye6Up/exec';
+const UPI_ID = 'BHARATPE2O0Y0W1R5Z29125@unitype';
+const UPI_NAME = 'Ritesh Bharatpay';
+const SESSION_KEY = 'csc_session';
 
-  const MAX_SIDE = 2000;
-  const JPEG_Q   = 0.85;
-  const SESSION_KEY = 'pd_mobile';
+let session = null;       // { mobile, name }
+let servicesCache = [];
+let currentOrderDraft = {}; // build-up object for the form being filled
 
-  let allPhotos    = [];
-  let lightboxIndex = 0;
-  let currentMobile = '';
-  let lastUploadedPhoto = null;
+// ── BOOT ──────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = sessionStorage.getItem(SESSION_KEY);
+  if (saved) { session = JSON.parse(saved); activateApp(); }
+});
 
-  // ─── BOOT ─────────────────────────────────────────────────────────────────────
-  window.addEventListener('DOMContentLoaded', () => {
-    const saved = sessionStorage.getItem(SESSION_KEY);
-    if (saved) activateApp(saved);
-    const inp = document.getElementById('mobileInput');
-    if (inp) setTimeout(() => inp.focus(), 100);
-  });
+// ── LOGIN FLOW ────────────────────────────────────────────────────────────
+async function checkMobile() {
+  const mobile = document.getElementById('loginMobile').value.trim();
+  const err = document.getElementById('loginErr1');
+  if (mobile.length !== 10) { err.textContent = 'Sahi 10-digit mobile number daalein.'; return; }
+  err.textContent = '';
+  setBtnLoading('checkBtn', true, 'Checking...');
 
-  // ─── LOGIN ────────────────────────────────────────────────────────────────────
-  function doLogin() {
-    const inp = document.getElementById('mobileInput');
-    const val = (inp.value || '').trim().replace(/\D/g, '');
-    const err = document.getElementById('loginError');
-    if (val.length !== 10) {
-      err.textContent = 'Please enter a valid 10-digit mobile number.';
-      inp.focus(); return;
-    }
-    err.textContent = '';
-    sessionStorage.setItem(SESSION_KEY, val);
-    activateApp(val);
-  }
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=checkUser&mobile=${mobile}`);
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Error');
 
-  function activateApp(mobile) {
-    currentMobile = mobile;
-    document.getElementById('userMobileDisplay').textContent = '+91 ' + mobile;
-    document.getElementById('userAvatar').textContent = mobile.slice(-2);
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('app').classList.add('visible');
-    setupDragDrop();
-    loadPhotos();
-  }
-
-  function doLogout() {
-    sessionStorage.removeItem(SESSION_KEY);
-    currentMobile = ''; allPhotos = [];
-    document.getElementById('app').classList.remove('visible');
-    document.getElementById('loginScreen').classList.remove('hidden');
-    document.getElementById('mobileInput').value = '';
-    document.getElementById('loginError').textContent = '';
-    setTimeout(() => document.getElementById('mobileInput').focus(), 100);
-  }
-
-  // ─── LOAD PHOTOS ──────────────────────────────────────────────────────────────
-  async function loadPhotos() {
-    showLoading();
-    document.getElementById('refreshBtn').disabled = true;
-    try {
-      const res  = await fetch(`${SCRIPT_URL}?action=list&mobile=${encodeURIComponent(currentMobile)}`);
-      const data = await res.json();
-      if (!data.success) throw new Error(data.error || 'Script returned failure');
-      allPhotos = data.images || [];
-      renderGallery(allPhotos);
-      updateCount(allPhotos.length);
-    } catch (err) {
-      showError('Could not load photos: ' + err.message);
-    } finally {
-      document.getElementById('refreshBtn').disabled = false;
-    }
-  }
-
-  // ─── UPLOAD ───────────────────────────────────────────────────────────────────
-  function triggerUpload() { document.getElementById('fileInput').click(); }
-
-  async function handleFiles(files) {
-    if (!files.length) return;
-    const arr  = Array.from(files);
-    const prog = document.getElementById('uploadProgress');
-    const fill = document.getElementById('progressFill');
-    const stat = document.getElementById('uploadStatus');
-
-    prog.classList.add('visible');
-    let uploaded = 0;
-    let lastFile = null;
-
-    for (let i = 0; i < arr.length; i++) {
-      const file = arr[i];
-      stat.textContent = `Uploading ${i+1}/${arr.length}: ${file.name}`;
-      fill.style.width  = `${Math.round((i / arr.length) * 100)}%`;
-
-      try {
-        const { b64, mimeType } = await compressImage(file);
-        const payload = {
-          action: 'upload', name: file.name, mime: mimeType,
-          data: b64, mobile: currentMobile
-        };
-        const res  = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (!data.success) throw new Error(data.error || 'Upload failed');
-
-        toast('✓ Uploaded: ' + file.name, 'success');
-        allPhotos.unshift(data.file);
-        reRenderTop();
-        updateCount(allPhotos.length);
-        uploaded++;
-        lastFile = data.file;
-
-      } catch (err) {
-        toast('✕ Failed: ' + file.name + ' — ' + err.message, 'error');
-        console.error(err);
-      }
-    }
-
-    fill.style.width = '100%';
-    stat.textContent = `${uploaded} of ${arr.length} uploaded!`;
-    setTimeout(() => { prog.classList.remove('visible'); fill.style.width = '0%'; }, 2000);
-    document.getElementById('fileInput').value = '';
-
-    // ── Show payment page after successful upload ──
-    if (uploaded > 0) {
-      lastUploadedPhoto = lastFile;
-      setTimeout(() => openPaymentPage(lastFile), 900);
-    }
-  }
-
-  // ─── PAYMENT PAGE ─────────────────────────────────────────────────────────────
-  function openPaymentPage(photo) {
-    const previewImg = document.getElementById('paymentPreviewImg');
-    if (photo && (photo.thumb || photo.src)) {
-      previewImg.src = photo.src || photo.thumb;
-      const bg = document.querySelector('.preview-bg-blur');
-      if (bg) bg.style.backgroundImage = `url('${photo.src || photo.thumb}')`;
+    if (data.registered) {
+      session = { mobile, name: data.name };
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+      activateApp();
     } else {
-      previewImg.src = `https://drive.google.com/thumbnail?id=${PRINT_PREVIEW_FILE_ID}&sz=w600`;
-      const bg = document.querySelector('.preview-bg-blur');
-      if (bg) bg.style.backgroundImage = `url('https://drive.google.com/thumbnail?id=${PRINT_PREVIEW_FILE_ID}&sz=w800')`;
+      document.getElementById('step1').classList.add('hidden');
+      document.getElementById('step2').classList.remove('hidden');
+      setTimeout(() => document.getElementById('loginName').focus(), 100);
     }
-    document.getElementById('paymentPage').classList.add('open');
+  } catch (e) {
+    err.textContent = 'Connection error: ' + e.message;
+  } finally {
+    setBtnLoading('checkBtn', false, 'Continue');
   }
+}
 
-  function closePaymentPage() {
-    document.getElementById('paymentPage').classList.remove('open');
-  }
+async function doRegister() {
+  const mobile = document.getElementById('loginMobile').value.trim();
+  const name = document.getElementById('loginName').value.trim();
+  const err = document.getElementById('loginErr2');
+  if (!name) { err.textContent = 'Naam daalna zaroori hai.'; return; }
+  err.textContent = '';
+  setBtnLoading('registerBtn', true, 'Submitting...');
 
-  function handlePayment() {
-    // Direct UPI deep link – opens any UPI app on the device
-    const upiUrl = 'upi://pay?pa=BHARATPE2O0Y0W1R5Z29125@unitype&pn=Ritesh%20Bharatpay&am=50.00&cu=INR';
-    window.location.href = upiUrl;
-  }
-
-  function enlargePreview() {
-    // Show the small preview image in a full-screen overlay (clear preview)
-    const previewImg = document.getElementById('paymentPreviewImg');
-    const largeOverlay = document.getElementById('imagePreviewOverlay');
-    const largeImg = document.getElementById('imagePreviewLarge');
-    // Use the same image but with a larger size for better clarity
-    const src = previewImg.src;
-    // If the source contains sz=w600, replace with w1000 for high-res preview
-    const highResSrc = src.includes('sz=w600')
-      ? src.replace('sz=w600', 'sz=w1000')
-      : src;
-    largeImg.src = highResSrc;
-    largeOverlay.classList.add('open');
-  }
-
-  function closeImagePreview() {
-    document.getElementById('imagePreviewOverlay').classList.remove('open');
-  }
-
-  // ─── COMPRESS ─────────────────────────────────────────────────────────────────
-  function compressImage(file) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      const url = URL.createObjectURL(file);
-      img.onload = () => {
-        URL.revokeObjectURL(url);
-        let w = img.width, h = img.height;
-        if (w > MAX_SIDE || h > MAX_SIDE) {
-          if (w > h) { h = Math.round(h * MAX_SIDE / w); w = MAX_SIDE; }
-          else        { w = Math.round(w * MAX_SIDE / h); h = MAX_SIDE; }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        const mimeType = 'image/jpeg';
-        const b64 = canvas.toDataURL(mimeType, JPEG_Q).split(',')[1];
-        resolve({ b64, mimeType });
-      };
-      img.onerror = () => reject(new Error('Could not read image'));
-      img.src = url;
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'registerUser', mobile, name })
     });
-  }
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Error');
 
-  // ─── GALLERY RENDER ───────────────────────────────────────────────────────────
-  function renderGallery(photos) {
-    const g = document.getElementById('gallery');
-    if (!photos.length) { showEmpty('No photos yet — upload some above!'); return; }
-    g.innerHTML = '';
-    photos.forEach((photo, i) => g.appendChild(buildCard(photo, i)));
+    session = { mobile, name: data.name };
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    activateApp();
+  } catch (e) {
+    err.textContent = 'Error: ' + e.message;
+  } finally {
+    setBtnLoading('registerBtn', false, 'Submit aur Login Karein');
   }
+}
 
-  function reRenderTop() {
-    const g = document.getElementById('gallery');
-    if (g.querySelector('.state-msg')) { renderGallery(allPhotos); return; }
-    g.querySelectorAll('.photo-card').forEach((el, i) => { el.onclick = () => openLightbox(i + 1); });
-    g.prepend(buildCard(allPhotos[0], 0));
+function setBtnLoading(id, loading, label) {
+  const btn = document.getElementById(id);
+  btn.disabled = loading;
+  btn.textContent = label;
+}
+
+function activateApp() {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('topUserName').textContent = session.name;
+  document.getElementById('topUserMobile').textContent = '+91 ' + session.mobile;
+  document.getElementById('smName').textContent = session.name;
+  document.getElementById('smMobile').textContent = '+91 ' + session.mobile;
+  document.getElementById('smAvatar').textContent = session.name.charAt(0).toUpperCase();
+  goHome();
+}
+
+function doLogout() {
+  sessionStorage.removeItem(SESSION_KEY);
+  session = null;
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('step1').classList.remove('hidden');
+  document.getElementById('step2').classList.add('hidden');
+  document.getElementById('loginMobile').value = '';
+  document.getElementById('loginName').value = '';
+  closeMenu();
+}
+
+// ── SIDE MENU ─────────────────────────────────────────────────────────────
+function openMenu(){ document.getElementById('sidemenu').classList.add('open'); document.getElementById('overlay').classList.add('open'); }
+function closeMenu(){ document.getElementById('sidemenu').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
+
+// ── ROUTER ────────────────────────────────────────────────────────────────
+function goHome() { closeMenu(); renderServiceHub(); }
+function goMyOrders() { closeMenu(); renderMyOrders(); }
+function goUploadedFiles() { closeMenu(); renderUploadedFiles(); }
+
+// ── SERVICE HUB ───────────────────────────────────────────────────────────
+const SERVICE_ICONS = {
+  photo_print: '🖼️', pvc_card: '🪪', certificate: '📜', pan_card: '💳', udyam: '🏭'
+};
+const SERVICE_COLORS = {
+  photo_print: { main:'#ff7a45', soft:'#fff0e8' },
+  pvc_card:    { main:'#2563eb', soft:'#e9f0ff' },
+  certificate: { main:'#16a34a', soft:'#e9f8ee' },
+  pan_card:    { main:'#9333ea', soft:'#f4ebfd' },
+  udyam:       { main:'#e11d48', soft:'#fdebef' }
+};
+
+async function renderServiceHub() {
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `<div class="page-title">Namaste, ${esc(session.name)} 👋</div><div class="page-sub">Service select karein</div><div class="spinner"></div>`;
+
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=getServices`);
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+    servicesCache = data.services;
+
+    let html = `<div class="page-title">Namaste, ${esc(session.name)} 👋</div><div class="page-sub">Service select karein</div><div class="service-grid">`;
+    servicesCache.forEach(s => {
+      const col = SERVICE_COLORS[s.id] || { main:'#ff7a45', soft:'#fff0e8' };
+      html += `
+        <div class="service-card" style="--card-color:${col.main};--card-color-soft:${col.soft}" onclick="openService('${esc(s.id)}')">
+          <div class="service-icon">${SERVICE_ICONS[s.id] || '📋'}</div>
+          <h3>${esc(s.name)}</h3>
+          <p>${esc(s.description || '')}</p>
+          <div class="service-price">₹${s.basePrice}${Number(s.homeDeliveryPrice)>0 ? ' + ₹'+s.homeDeliveryPrice+' delivery':''}</div>
+        </div>`;
+    });
+    html += `</div>`;
+    main.innerHTML = html;
+  } catch (e) {
+    main.innerHTML = `<div class="empty-state"><h3>⚠️ Error</h3><p>${esc(e.message)}</p></div>`;
   }
+}
 
-  function buildCard(photo, i) {
-    const card = document.createElement('div');
-    card.className = 'photo-card';
-    card.onclick = () => openLightbox(i);
-    const date = photo.created
-      ? new Date(photo.created).toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' })
-      : '';
-    const displayName = photo.name.replace(/^mob_\d{10}_/, '');
-    card.innerHTML = `
-      <img src="${esc(photo.thumb)}" alt="${esc(displayName)}" loading="lazy"
-           onerror="this.src='https://drive.google.com/thumbnail?id=${esc(photo.id)}&sz=w400'">
-      <div class="card-overlay">
-        <div><div class="card-name">${esc(displayName)}</div><div class="card-date">${date}</div></div>
+function openService(id) {
+  currentOrderDraft = { service: id, files: {}, details: {} };
+  if (id === 'photo_print')  return renderPhotoPrintForm();
+  if (id === 'pvc_card')     return renderPvcCardForm();
+  if (id === 'certificate')  return renderCertificateForm();
+  if (id === 'pan_card')     return renderPanCardForm();
+  if (id === 'udyam')        return renderUdyamForm();
+}
+
+function getSvc(id) { return servicesCache.find(s => s.id === id) || {}; }
+
+// ── BACK BUTTON HELPER ────────────────────────────────────────────────────
+function backRow(label, fn) {
+  return `<div class="back-row" onclick="${fn}">← ${label}</div>`;
+}
+
+// ── FILE UPLOAD WIDGET (returns HTML, wires change handler) ───────────────
+function uploadWidget(key, label, optional=true) {
+  return `
+    <div class="field">
+      <label>${label}${optional ? '<span class="optional-tag">Optional</span>' : ''}</label>
+      <div class="upload-box" id="box_${key}">
+        <input type="file" accept="image/*" onchange="onFileSelect('${key}', this)">
+        <div class="ub-label" id="lbl_${key}">📤 Tap to upload</div>
+        <div class="ub-sub">JPG / PNG</div>
+        <img class="upload-preview hidden" id="prev_${key}">
       </div>
-      <div class="list-info" style="display:none">
-        <div class="card-name">${esc(displayName)}</div>
-        <div class="card-date">${date}</div>
-      </div>`;
-    return card;
-  }
+    </div>`;
+}
 
-  // ─── DRAG & DROP ──────────────────────────────────────────────────────────────
-  function setupDragDrop() {
-    const zone = document.getElementById('uploadZone');
-    zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
-    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-    zone.addEventListener('drop', e => {
-      e.preventDefault(); zone.classList.remove('drag-over');
-      handleFiles(e.dataTransfer.files);
+async function onFileSelect(key, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const box = document.getElementById(`box_${key}`);
+  const lbl = document.getElementById(`lbl_${key}`);
+  const prev = document.getElementById(`prev_${key}`);
+
+  lbl.textContent = '⏳ Uploading...';
+
+  try {
+    const { b64, mime } = await fileToBase64(file);
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'uploadFile', name: file.name, mime, data: b64, mobile: session.mobile })
     });
-  }
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
 
-  // ─── LIGHTBOX ─────────────────────────────────────────────────────────────────
-  function openLightbox(i) {
-    lightboxIndex = i;
-    document.getElementById('lightbox').classList.add('open');
-    updateLightbox();
-    document.addEventListener('keydown', lbKeys);
+    currentOrderDraft.files[key] = { fileId: data.fileId, url: data.url, name: data.name };
+    box.classList.add('has-file');
+    lbl.textContent = '✅ ' + file.name;
+    prev.src = data.thumb;
+    prev.classList.remove('hidden');
+    toast('Uploaded: ' + file.name, 'success');
+  } catch (e) {
+    lbl.textContent = '❌ Upload failed';
+    toast('Upload error: ' + e.message, 'error');
   }
-  function updateLightbox() {
-    const p = allPhotos[lightboxIndex];
-    document.getElementById('lightboxImg').src = p.src || p.thumb;
-    const name = p.name.replace(/^mob_\d{10}_/, '');
-    document.getElementById('lightboxCaption').textContent = name + ' · ' + (lightboxIndex + 1) + ' / ' + allPhotos.length;
-  }
-  function closeLightbox() {
-    document.getElementById('lightbox').classList.remove('open');
-    document.removeEventListener('keydown', lbKeys);
-  }
-  document.getElementById('lightbox').addEventListener('click', e => { if (e.target === e.currentTarget) closeLightbox(); });
-  function navigate(d) { lightboxIndex = (lightboxIndex + d + allPhotos.length) % allPhotos.length; updateLightbox(); }
-  function lbKeys(e) {
-    if (e.key === 'ArrowRight') navigate(1);
-    if (e.key === 'ArrowLeft')  navigate(-1);
-    if (e.key === 'Escape') { closeLightbox(); closePaymentPage(); closeImagePreview(); }
-  }
+}
 
-  // ─── VIEW MODES ───────────────────────────────────────────────────────────────
-  function setView(mode) {
-    const g = document.getElementById('gallery');
-    g.className = '';
-    document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-    if (mode === 'grid3') { g.classList.add('cols-3'); document.getElementById('grid3Btn').classList.add('active'); }
-    else if (mode === 'list') {
-      g.classList.add('list-view'); document.getElementById('listBtn').classList.add('active');
-      g.querySelectorAll('.list-info').forEach(el => el.style.display = 'block'); return;
-    } else { document.getElementById('grid4Btn').classList.add('active'); }
-    g.querySelectorAll('.list-info').forEach(el => el.style.display = 'none');
-  }
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const b64 = reader.result.split(',')[1];
+      resolve({ b64, mime: file.type || 'image/jpeg' });
+    };
+    reader.onerror = () => reject(new Error('Could not read file'));
+    reader.readAsDataURL(file);
+  });
+}
 
-  // ─── HELPERS ──────────────────────────────────────────────────────────────────
-  function showLoading() { document.getElementById('gallery').innerHTML = '<div class="state-msg"><div class="spinner"></div><h3>Loading your photos…</h3></div>'; }
-  function showEmpty(m)  { document.getElementById('gallery').innerHTML = `<div class="state-msg"><h3>No photos yet</h3><p>${m}</p></div>`; updateCount(0); }
-  function showError(m)  { document.getElementById('gallery').innerHTML = `<div class="state-msg"><h3>⚠️ Error</h3><p>${m}</p></div>`; }
-  function updateCount(n){ document.getElementById('countBadge').innerHTML = `<strong>${n}</strong> photo${n !== 1 ? 's' : ''}`; }
-  function toast(msg, type = 'success') {
-    const c = document.getElementById('toastContainer');
-    const t = document.createElement('div');
-    t.className = `toast ${type}`; t.textContent = msg; c.appendChild(t);
-    setTimeout(() => t.remove(), 4000);
+// ── OPTION PILL WIDGET ────────────────────────────────────────────────────
+function pillGroup(groupKey, options, onSelectFn) {
+  let html = `<div class="option-row" id="grp_${groupKey}">`;
+  options.forEach(opt => {
+    html += `<div class="option-pill" data-val="${esc(opt)}" onclick="${onSelectFn}('${groupKey}','${esc(opt)}', this)">${esc(opt)}</div>`;
+  });
+  html += `</div>`;
+  return html;
+}
+function selectPill(groupKey, val, el) {
+  document.querySelectorAll(`#grp_${groupKey} .option-pill`).forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  currentOrderDraft.details[groupKey] = val;
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// SERVICE FORM 1: PHOTO PRINT
+// ════════════════════════════════════════════════════════════════════════
+function renderPhotoPrintForm() {
+  const svc = getSvc('photo_print');
+  document.getElementById('mainContent').innerHTML = `
+    ${backRow('Services', 'goHome()')}
+    <div class="page-title">🖼️ Photo Print</div>
+    <div class="page-sub">${esc(svc.description||'')}</div>
+
+    ${uploadWidget('photo', 'Upload Photo', false)}
+
+    <div class="field">
+      <label>Photo Type</label>
+      ${pillGroup('photoType', ['Passport Photo','Full Photo'], 'selectPill')}
+    </div>
+
+    <div class="checkbox-row" onclick="toggleDelivery(this)">
+      <input type="checkbox" id="homeDeliveryChk" onclick="event.stopPropagation()">
+      <span>🚚 Home Delivery chahiye? (+₹${svc.homeDeliveryPrice})</span>
+    </div>
+
+    ${summaryAndSubmit('photo_print')}
+  `;
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// SERVICE FORM 2: PVC CARD PRINT
+// ════════════════════════════════════════════════════════════════════════
+function renderPvcCardForm() {
+  const svc = getSvc('pvc_card');
+  document.getElementById('mainContent').innerHTML = `
+    ${backRow('Services', 'goHome()')}
+    <div class="page-title">🪪 PVC Card Print</div>
+    <div class="page-sub">${esc(svc.description||'')}</div>
+
+    ${uploadWidget('front', 'Front Image', false)}
+    ${uploadWidget('back', 'Back Image', false)}
+
+    <div class="checkbox-row" onclick="toggleDelivery(this)">
+      <input type="checkbox" id="homeDeliveryChk" onclick="event.stopPropagation()">
+      <span>🚚 Home Delivery chahiye? (+₹${svc.homeDeliveryPrice})</span>
+    </div>
+
+    ${summaryAndSubmit('pvc_card')}
+  `;
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// SERVICE FORM 3: CERTIFICATE APPLY
+// ════════════════════════════════════════════════════════════════════════
+function renderCertificateForm() {
+  document.getElementById('mainContent').innerHTML = `
+    ${backRow('Services', 'goHome()')}
+    <div class="page-title">📜 Certificate Apply</div>
+    <div class="page-sub">Certificate type select karein</div>
+
+    <div class="field">
+      <label>Certificate Type</label>
+      ${pillGroup('certType', ['Caste Certificate','Resident Certificate','Income Certificate','Character Certificate'], 'selectCertType')}
+    </div>
+
+    ${uploadWidget('aadharFront', 'Aadhar Card - Front')}
+    ${uploadWidget('aadharBack', 'Aadhar Card - Back')}
+    ${uploadWidget('photo', 'Photo')}
+    ${uploadWidget('ror', 'ROR Copy')}
+
+    ${summaryAndSubmit('certificate')}
+  `;
+}
+function selectCertType(groupKey, val, el) {
+  selectPill(groupKey, val, el);
+  recalcSummary('certificate');
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// SERVICE FORM 4: PAN CARD APPLY
+// ════════════════════════════════════════════════════════════════════════
+function renderPanCardForm() {
+  document.getElementById('mainContent').innerHTML = `
+    ${backRow('Services', 'goHome()')}
+    <div class="page-title">💳 Pan Card Apply</div>
+    <div class="page-sub">Documents upload karein aur details bharein</div>
+
+    ${uploadWidget('aadharFront', 'Aadhar Card - Front')}
+    ${uploadWidget('aadharBack', 'Aadhar Card - Back')}
+    ${uploadWidget('tenthCert', '10th Certificate')}
+    ${uploadWidget('voterCard', 'Voter Card')}
+
+    <div class="field">
+      <label>Aadhar Link Mobile Number</label>
+      <input type="tel" id="aadharMobile" placeholder="10-digit mobile number" maxlength="10"
+             oninput="this.value=this.value.replace(/\\D/g,''); currentOrderDraft.details.aadharMobile=this.value;">
+    </div>
+
+    ${summaryAndSubmit('pan_card')}
+  `;
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// SERVICE FORM 5: UDYAM REGISTRATION
+// ════════════════════════════════════════════════════════════════════════
+function renderUdyamForm() {
+  document.getElementById('mainContent').innerHTML = `
+    ${backRow('Services', 'goHome()')}
+    <div class="page-title">🏭 Udyam Registration</div>
+    <div class="page-sub">Documents upload karein aur details bharein</div>
+
+    ${uploadWidget('aadharFront', 'Aadhar Card - Front')}
+    ${uploadWidget('aadharBack', 'Aadhar Card - Back')}
+    ${uploadWidget('passbook', 'Bank Passbook')}
+
+    <div class="field">
+      <label>Aadhar Link Mobile Number</label>
+      <input type="tel" id="aadharMobile" placeholder="10-digit mobile number" maxlength="10"
+             oninput="this.value=this.value.replace(/\\D/g,''); currentOrderDraft.details.aadharMobile=this.value;">
+    </div>
+    <div class="field">
+      <label>Email ID</label>
+      <input type="email" id="emailId" placeholder="you@example.com"
+             oninput="currentOrderDraft.details.email=this.value;">
+    </div>
+
+    ${summaryAndSubmit('udyam')}
+  `;
+}
+
+// ── DELIVERY TOGGLE ───────────────────────────────────────────────────────
+function toggleDelivery(rowEl) {
+  const chk = rowEl.querySelector('input[type=checkbox]');
+  chk.checked = !chk.checked;
+  currentOrderDraft.homeDelivery = chk.checked;
+  recalcSummary(currentOrderDraft.service);
+}
+
+// ── SUMMARY + SUBMIT BLOCK ────────────────────────────────────────────────
+function summaryAndSubmit(serviceId) {
+  return `
+    <div class="summary-box" id="summaryBox"></div>
+    <button class="btn btn-accent" onclick="submitOrder('${serviceId}')">Submit Order</button>
+  `;
+}
+
+function calcAmount(serviceId) {
+  const svc = getSvc(serviceId);
+  let base = Number(svc.basePrice) || 0;
+  let delivery = 0;
+
+  if (serviceId === 'certificate') {
+    if (currentOrderDraft.details.certType === 'Character Certificate') base += 50;
   }
-  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  if (currentOrderDraft.homeDelivery) {
+    delivery = Number(svc.homeDeliveryPrice) || 0;
+  }
+  return { base, delivery, total: base + delivery };
+}
+
+function recalcSummary(serviceId) {
+  const box = document.getElementById('summaryBox');
+  if (!box) return;
+  const { base, delivery, total } = calcAmount(serviceId);
+  box.innerHTML = `
+    <div class="summary-row"><span>Service Charge</span><span>₹${base}</span></div>
+    ${delivery > 0 ? `<div class="summary-row"><span>Home Delivery</span><span>₹${delivery}</span></div>` : ''}
+    <div class="summary-row total"><span>Total Amount</span><span>₹${total}</span></div>
+  `;
+}
+
+// Recalc summary on every relevant interaction
+document.addEventListener('click', () => { if (currentOrderDraft.service) recalcSummary(currentOrderDraft.service); });
+document.addEventListener('input', () => { if (currentOrderDraft.service) recalcSummary(currentOrderDraft.service); });
+
+// ── SUBMIT ORDER ───────────────────────────────────────────────────────────
+async function submitOrder(serviceId) {
+  const { base, delivery, total } = calcAmount(serviceId);
+
+  // Build subtype/extra fields based on service
+  let subtype = '';
+  if (serviceId === 'photo_print') subtype = currentOrderDraft.details.photoType || '';
+  if (serviceId === 'certificate')  subtype = currentOrderDraft.details.certType || '';
+
+  const payload = {
+    action: 'placeOrder',
+    mobile: session.mobile,
+    name: session.name,
+    service: serviceId,
+    subtype,
+    details: currentOrderDraft.details,
+    files: currentOrderDraft.files,
+    baseAmount: base,
+    deliveryAmount: delivery,
+    homeDelivery: !!currentOrderDraft.homeDelivery
+  };
+
+  const main = document.getElementById('mainContent');
+  const prevHtml = main.innerHTML;
+  main.innerHTML = '<div class="spinner"></div><p style="text-align:center;color:var(--muted)">Order place ho raha hai...</p>';
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Order failed');
+
+    renderPaymentPage(data.orderId, data.totalAmount, data.upiLink);
+  } catch (e) {
+    main.innerHTML = prevHtml;
+    toast('Error: ' + e.message, 'error');
+  }
+}
+
+// ── PAYMENT PAGE ───────────────────────────────────────────────────────────
+function renderPaymentPage(orderId, amount, upiLink) {
+  document.getElementById('mainContent').innerHTML = `
+    <div class="page-title">💰 Payment</div>
+    <div class="page-sub">QR scan karein ya UPI app se pay karein</div>
+    <div class="pay-card">
+      <div style="font-size:.8rem;color:var(--muted)">Amount Payable</div>
+      <div class="pay-amount">₹${amount}</div>
+      <div class="pay-orderid">Order ID: ${esc(orderId)}</div>
+      <div id="qrCanvas"></div>
+      <a class="btn btn-accent" href="${upiLink}" style="text-decoration:none;display:block;margin-bottom:10px;">📲 Pay Now via UPI App</a>
+      <button class="btn btn-ghost" onclick="goMyOrders()">✅ Maine Payment Kar Diya — My Orders Dekhein</button>
+      <p class="pay-note">Payment ke baad order automatically "Pending" status me My Orders me dikhega. Admin verify karne ke baad status update karega.</p>
+    </div>
+  `;
+  new QRCode(document.getElementById('qrCanvas'), {
+    text: upiLink, width: 200, height: 200,
+    colorDark: '#000000', colorLight: '#ffffff'
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// MY ORDERS
+// ════════════════════════════════════════════════════════════════════════
+async function renderMyOrders() {
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `<div class="page-title">📦 My Orders</div><div class="spinner"></div>`;
+
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=getMyOrders&mobile=${session.mobile}`);
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+
+    if (!data.orders.length) {
+      main.innerHTML = `<div class="page-title">📦 My Orders</div><div class="empty-state"><h3>Koi order nahi mila</h3><p>Service select karke order karein</p></div>`;
+      return;
+    }
+
+    let html = `<div class="page-title">📦 My Orders</div>`;
+    data.orders.forEach(o => {
+      const badgeClass = {
+        'Pending':'badge-pending','Accepted':'badge-accepted',
+        'Rejected':'badge-rejected','Completed':'badge-completed'
+      }[o.status] || 'badge-pending';
+
+      html += `
+        <div class="order-card">
+          <div class="order-top">
+            <div>
+              <div class="order-service">${esc(serviceLabel(o.service))} ${o.subtype ? '· '+esc(o.subtype) : ''}</div>
+              <div class="order-id">${esc(o.orderId)}</div>
+            </div>
+            <span class="badge ${badgeClass}">${esc(o.status)}</span>
+          </div>
+          <div class="order-meta">
+            <span>₹${o.totalAmount} · ${esc(o.paymentStatus)}</span>
+            <span>${new Date(o.createdAt).toLocaleDateString()}</span>
+          </div>
+        </div>`;
+    });
+    main.innerHTML = html;
+  } catch (e) {
+    main.innerHTML = `<div class="empty-state"><h3>⚠️ Error</h3><p>${esc(e.message)}</p></div>`;
+  }
+}
+
+function serviceLabel(id) {
+  const labels = { photo_print:'Photo Print', pvc_card:'PVC Card Print', certificate:'Certificate', pan_card:'Pan Card', udyam:'Udyam Registration' };
+  return labels[id] || id;
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// UPLOADED FILES — every file the user has ever uploaded, grouped by order
+// ════════════════════════════════════════════════════════════════════════
+const FIELD_LABELS = {
+  photo:'Photo', front:'Front Image', back:'Back Image',
+  aadharFront:'Aadhar Front', aadharBack:'Aadhar Back',
+  ror:'ROR Copy', tenthCert:'10th Certificate', voterCard:'Voter Card',
+  passbook:'Bank Passbook'
+};
+
+async function renderUploadedFiles() {
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `<div class="page-title">🖼️ Uploaded Files</div><div class="page-sub">Aapke saare uploaded documents aur photos</div><div class="spinner"></div>`;
+
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=getMyOrders&mobile=${session.mobile}`);
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+
+    // Build a flat list of { url, thumb, label, orderId, service, date }
+    const allFiles = [];
+    data.orders.forEach(o => {
+      let files = {};
+      try { files = JSON.parse(o.files || '{}'); } catch(e) {}
+      Object.keys(files).forEach(key => {
+        const f = files[key];
+        if (!f || !f.fileId) return;
+        allFiles.push({
+          fileId: f.fileId,
+          url: f.url || `https://drive.google.com/uc?export=view&id=${f.fileId}`,
+          thumb: `https://drive.google.com/thumbnail?id=${f.fileId}&sz=w400`,
+          label: FIELD_LABELS[key] || key,
+          orderId: o.orderId,
+          service: o.service,
+          date: o.createdAt
+        });
+      });
+    });
+
+    if (!allFiles.length) {
+      main.innerHTML = `<div class="page-title">🖼️ Uploaded Files</div><div class="empty-state"><h3>Koi file upload nahi hui</h3><p>Jab aap koi order karenge to uploaded documents yahan dikhenge</p></div>`;
+      return;
+    }
+
+    // Group by orderId, newest order first
+    const byOrder = {};
+    allFiles.forEach(f => { (byOrder[f.orderId] = byOrder[f.orderId] || []).push(f); });
+    const orderIds = Object.keys(byOrder).sort((a,b) => new Date(byOrder[b][0].date) - new Date(byOrder[a][0].date));
+
+    let html = `<div class="page-title">🖼️ Uploaded Files</div><div class="page-sub">${allFiles.length} files across ${orderIds.length} orders</div>`;
+
+    orderIds.forEach(oid => {
+      const group = byOrder[oid];
+      const dateStr = new Date(group[0].date).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'});
+      html += `<div class="file-group-title">${esc(serviceLabel(group[0].service))} · ${esc(oid)} · ${dateStr}</div><div class="files-grid">`;
+      group.forEach(f => {
+        html += `
+          <div class="file-card" onclick="openFileLightbox('${esc(f.url)}')">
+            <img src="${esc(f.thumb)}" alt="${esc(f.label)}" loading="lazy" onerror="this.src='${esc(f.url)}'">
+            <div class="file-card-info">
+              <div class="file-card-label">${esc(f.label)}</div>
+              <div class="file-card-sub">${esc(oid)}</div>
+            </div>
+          </div>`;
+      });
+      html += `</div>`;
+    });
+
+    main.innerHTML = html;
+  } catch (e) {
+    main.innerHTML = `<div class="empty-state"><h3>⚠️ Error</h3><p>${esc(e.message)}</p></div>`;
+  }
+}
+
+function openFileLightbox(url) {
+  document.getElementById('fileLightboxImg').src = url;
+  document.getElementById('fileLightbox').classList.add('open');
+}
+function closeFileLightbox(e) {
+  if (e.target.id === 'fileLightbox' || e.target.classList.contains('file-lightbox-close')) {
+    document.getElementById('fileLightbox').classList.remove('open');
+  }
+}
+
+// ── TOAST ──────────────────────────────────────────────────────────────────
+function toast(msg, type='success') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`; t.textContent = msg; c.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 </script>
 </body>
 </html>
