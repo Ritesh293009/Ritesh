@@ -265,7 +265,7 @@
 
 <script>
 // ════════════════════════════════════════════════════════════════════════════
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxU7i3QwApaCxzsFDJet70EcQ7ptNqmPrFMYESFb3rawa5VEm7o4us05WW83yqBrnA/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztBeHtBAt8tQh6XsdYO-KZjc6v5yGsc4UJMUklIBW_KAax4DUWOJf52JF-P--KMA8X/exec';
 const UPI_ID = 'BHARATPE2O0Y0W1R5Z29125@unitype';
 const UPI_NAME = 'Ritesh Bharatpay';
 const SESSION_KEY = 'csc_session';
@@ -408,12 +408,14 @@ async function renderServiceHub() {
     let html = `<div class="page-title">Namaste, ${esc(session.name)} 👋</div><div class="page-sub">Service select karein</div><div class="service-grid">`;
     servicesCache.forEach((s, idx) => {
       const col = SERVICE_COLORS[s.id] || FALLBACK_COLORS[idx % FALLBACK_COLORS.length];
+      const linkBtn = s.linkUrl ? `<a href="${esc(s.linkUrl)}" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:4px;margin-top:8px;font-size:.75rem;font-weight:700;color:var(--brand2);text-decoration:none;background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.2);border-radius:99px;padding:3px 10px;">🔗 ${esc(s.linkName || 'Open Link')}</a>` : '';
       html += `
         <div class="service-card" style="--card-color:${col.main};--card-color-soft:${col.soft}" onclick="openService('${esc(s.id)}')">
           <div class="service-icon">${SERVICE_ICONS[s.id] || '📋'}</div>
           <h3>${esc(s.name)}</h3>
           <p>${esc(s.description || '')}</p>
           <div class="service-price">₹${s.basePrice}${Number(s.homeDeliveryPrice)>0 ? ' + ₹'+s.homeDeliveryPrice+' delivery':''}</div>
+          ${linkBtn}
         </div>`;
     });
     html += `</div>`;
@@ -440,6 +442,21 @@ function openService(id) {
 }
 
 function getSvc(id) { return servicesCache.find(s => s.id === id) || {}; }
+
+// Returns a styled link button for a service if admin has set one, else ''
+function serviceLinkBlock(id) {
+  const svc = getSvc(id);
+  if (!svc.linkUrl) return '';
+  return `
+    <a href="${esc(svc.linkUrl)}" target="_blank"
+       style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:18px;
+              background:rgba(37,99,235,.07);border:1.5px solid rgba(37,99,235,.22);
+              border-radius:var(--radius-sm);padding:13px 16px;text-decoration:none;
+              color:var(--brand2);font-weight:700;font-size:.9rem;">
+      🔗 ${esc(svc.linkName || 'Open Link')}
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+    </a>`;
+}
 
 // ── BACK BUTTON HELPER ────────────────────────────────────────────────────
 function backRow(label, fn) {
@@ -527,6 +544,7 @@ function renderPhotoPrintForm() {
     ${backRow('Services', 'goHome()')}
     <div class="page-title">🖼️ Photo Print</div>
     <div class="page-sub">${esc(svc.description||'')}</div>
+    ${serviceLinkBlock('photo_print')}
 
     ${uploadWidget('photo', 'Upload Photo', false)}
 
@@ -553,6 +571,7 @@ function renderPvcCardForm() {
     ${backRow('Services', 'goHome()')}
     <div class="page-title">🪪 PVC Card Print</div>
     <div class="page-sub">${esc(svc.description||'')}</div>
+    ${serviceLinkBlock('pvc_card')}
 
     ${uploadWidget('front', 'Front Image', false)}
     ${uploadWidget('back', 'Back Image', false)}
@@ -574,6 +593,7 @@ function renderCertificateForm() {
     ${backRow('Services', 'goHome()')}
     <div class="page-title">📜 Certificate Apply</div>
     <div class="page-sub">Certificate type select karein</div>
+    ${serviceLinkBlock('certificate')}
 
     <div class="field">
       <label>Certificate Type</label>
@@ -601,6 +621,7 @@ function renderPanCardForm() {
     ${backRow('Services', 'goHome()')}
     <div class="page-title">💳 Pan Card Apply</div>
     <div class="page-sub">Documents upload karein aur details bharein</div>
+    ${serviceLinkBlock('pan_card')}
 
     ${uploadWidget('aadharFront', 'Aadhar Card - Front')}
     ${uploadWidget('aadharBack', 'Aadhar Card - Back')}
@@ -625,6 +646,7 @@ function renderUdyamForm() {
     ${backRow('Services', 'goHome()')}
     <div class="page-title">🏭 Udyam Registration</div>
     <div class="page-sub">Documents upload karein aur details bharein</div>
+    ${serviceLinkBlock('udyam')}
 
     ${uploadWidget('aadharFront', 'Aadhar Card - Front')}
     ${uploadWidget('aadharBack', 'Aadhar Card - Back')}
@@ -683,7 +705,7 @@ function renderDynamicForm(id) {
     ${backRow('Services', 'goHome()')}
     <div class="page-title">${SERVICE_ICONS[id] || '📋'} ${esc(svc.name || id)}</div>
     <div class="page-sub">${esc(svc.description || '')}</div>
-
+    ${serviceLinkBlock(id)}
     ${fieldsHtml}
     ${homeDeliveryRow}
 
